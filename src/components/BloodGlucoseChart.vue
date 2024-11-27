@@ -58,7 +58,21 @@ export default {
         responsive: true,
         scales: {
           x: {
-            type: 'time'
+            type: 'time',
+            time: {
+              unit: "hour", // Display ticks every hour
+              displayFormats: {
+                hour: "HH:mm", // Custom format for hours
+              },
+            },
+            ticks: {
+              maxTicksLimit: 10,
+              stepSize: 0.5,
+            },
+            grid: {
+              drawTicks: true, // Ensures tick marks align with grid lines
+              color: "#666666", // Vertical grid line color
+            },
           },
           y: {
             min: 2, // Minimum Y value for glucose (you can adjust this based on expected range)
