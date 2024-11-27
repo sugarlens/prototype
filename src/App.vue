@@ -30,12 +30,7 @@
         <div v-else class="d-flex flex-column fill-height">
           <v-row>
             <v-col cols="12">
-              <v-card>
-                <v-card-text>
-                  <p style="font-size: 30px;">{{ data.mmol }} {{ data.trend.arrow }}</p>
-                  <p>{{ this.lastReading }}</p>
-                </v-card-text>
-              </v-card>
+              <MainValue :history="this.history"></MainValue>
             </v-col>
           </v-row>
           <v-row class="fill-height" style="flex-grow: 1;">
@@ -50,13 +45,14 @@
 </template>
 
 <script>
-import moment from 'moment';
+import MainValue from './components/MainValue.vue';
 import BloodGlucoseChart from './components/BloodGlucoseChart.vue';
 
 const Client = require('./dexcom.js');
 
 export default {
   components: {
+    MainValue,
     BloodGlucoseChart,
   },
   data() {
@@ -66,24 +62,44 @@ export default {
       valid: false,
       isLoggedIn: false,
       dexcomClient: null,
-      data: {
-        mmol: 5,
-        trend: {
-          arrow: '\u2192',
-        },
-      },
       history: [
-        { time: '2024-11-26 14:00', glucose: 3.8 },
-        { time: '2024-11-26 14:10', glucose: 6.5 },
-        { time: '2024-11-26 14:20', glucose: 8.0 },
-        { time: '2024-11-26 14:30', glucose: 5.2 },
-        { time: '2024-11-26 15:00', glucose: 3.8 },
-        { time: '2024-11-26 15:10', glucose: 6.5 },
-        { time: '2024-11-26 15:20', glucose: 8.0 },
-        { time: '2024-11-26 15:30', glucose: 5.2 },
-        // Add more readings here...
+        {"time": "2024-11-26 14:00", "mmol":2.2, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:05", "mmol":2.4, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:10", "mmol":2.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:15", "mmol":2.8, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:20", "mmol":3, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:25", "mmol":3.2, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:30", "mmol":3.4, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:35", "mmol":3.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:40", "mmol":4.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:45", "mmol":5.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:50", "mmol":6.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:55", "mmol":7.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:00", "mmol":8.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:05", "mmol":9.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:10", "mmol":10.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:15", "mmol":11.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        // {"time": "2024-11-26 15:20", "mmol":12.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        // {"time": "2024-11-26 15:25", "mmol":13.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        // {"time": "2024-11-26 15:30", "mmol":14.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        // {"time": "2024-11-26 15:35", "mmol":15.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        // {"time": "2024-11-26 15:40", "mmol":16.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        // {"time": "2024-11-26 15:45", "mmol":17.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        // {"time": "2024-11-26 15:50", "mmol":18.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        // {"time": "2024-11-26 15:55", "mmol":19.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        // {"time": "2024-11-26 16:00", "mmol":18, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        // {"time": "2024-11-26 16:05", "mmol":17, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:10", "mmol":16, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:15", "mmol":15, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:20", "mmol":14, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:25", "mmol":13, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:30", "mmol":12, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:35", "mmol":11, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:40", "mmol":10, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:45", "mmol":9.2, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:50", "mmol":9.1, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:55", "mmol":8.7, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
       ],
-      lastReading: null,
       rules: {
         required: value => !!value || 'This field is required',
       },
@@ -125,22 +141,13 @@ export default {
       // Set an interval to fetch data every minute (60,000 milliseconds)
       this.fetchInterval = setInterval(() => {
         this.fetchData();
-      }, 60000);
+      }, 2*60000);
     },
     fetchData() {
-      console.log(moment().format() + " - Fetching new data...");
-      this.dexcomClient.fetchLastReading()
-      .then((data) => {
-        this.data = data;
-        this.lastReading = moment(this.data.time).fromNow();
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error)
-      });
-
+      console.log(" - Fetching new data...");
       this.dexcomClient.fetchReadings(180, 36).then(
         (data) => {
-          this.history = data.map(reading => ({time: reading.time, glucose: reading.mmol})).reverse();
+          this.history = data.reverse();
         }
       );
     },

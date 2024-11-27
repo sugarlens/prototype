@@ -3,8 +3,6 @@ module.exports = defineConfig({
   transpileDependencies: true,
   publicPath: "/prototype/",
   pluginOptions: {
-    vuetify: {
-			// https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
-		}
+    vuetify: { }
   }
 })
