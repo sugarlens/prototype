@@ -1,6 +1,6 @@
 <template>
     <div class="text-center">
-        <p class="muted">Average - 24h</p>
+        <p class="muted">Avg - 24h</p>
         <p class="large">{{ average }}</p>
         <p class="muted">mmol/l</p>
     </div>
@@ -52,6 +52,6 @@ export default {
     font-size: .8em;
 }
 .large {
-    font-size: 2.5em;
+    font-size: 2em;
 }
 </style>

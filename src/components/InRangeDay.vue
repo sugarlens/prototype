@@ -1,6 +1,6 @@
 <template>
     <div class="text-center">
-        <p class="muted">In range - 24h</p>
+        <p class="muted">Range-24h</p>
         <p class="large">{{ inRange }}%</p>
     </div>
 </template>
@@ -48,9 +48,9 @@ export default {
 <style scoped>
 .muted {
     opacity: 0.5;
-    font-size: .8em;
+    font-size: .7em;
 }
 .large {
-    font-size: 3em;
+    font-size: 2em;
 }
 </style>
