@@ -11,6 +11,11 @@ import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
 
+const minValue = 2;
+const maxValue = 17;
+const optimalMin = 4;
+const optimalMax = 10;
+
 // Register the necessary Chart.js components
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement);
 
@@ -75,8 +80,8 @@ export default {
             },
           },
           y: {
-            min: 2, // Minimum Y value for glucose (you can adjust this based on expected range)
-            max: 17,
+            min: minValue,
+            max: maxValue,
             title: {
               display: false
             },
@@ -89,8 +94,8 @@ export default {
         },
         maintainAspectRatio: false,
         horizontalLines: [
-          { y: 4, color: "red", lineWidth: 2, dash: [5, 5] },
-          { y: 10, color: "orange", lineWidth: 2, dash: [5, 5] },
+          { y: optimalMin, color: "red", lineWidth: 2, dash: [5, 5] },
+          { y: optimalMax, color: "orange", lineWidth: 2, dash: [5, 5] },
         ],
 
       }
@@ -111,7 +116,7 @@ export default {
 
       // Extract times and glucose values from the readings prop
       const times = readings.map((reading) => reading.time);
-      const glucoseValues = readings.map((reading) => reading.mmol);
+      const glucoseValues = readings.map((reading) => this.getActualReading(reading.mmol));
       const colors = readings.map((reading) => this.getColorForReading(reading.mmol));
 
       // Set chartData with proper structure
@@ -128,15 +133,25 @@ export default {
     },
     // Determine the color based on whether the reading is in range
     getColorForReading(glucose) {
-      const lowerLimit = 4;  // Lower bound for normal blood glucose range in mmol/L
-      const upperLimit = 10;  // Upper bound for normal blood glucose range in mmol/L
-      if (glucose < lowerLimit) {
-        return 'red';  // Below range
-      } else if (glucose > upperLimit) {
-        return 'orange';  // Above range
+      if (glucose <= minValue) {
+        return '#660000';
+      } else if (glucose < optimalMin) {
+        return 'red';
+      } else if (glucose > maxValue) {
+        return '#603B00';
+      } else if (glucose >= optimalMax) {
+        return 'orange';
       } else {
-        return 'lightgreen';  // In range
+        return 'lightgreen';
       }
+    },
+    getActualReading(glucose) {
+      if (glucose < minValue) {
+        return minValue;
+      } else if (glucose > maxValue) {
+        return maxValue;
+      }
+      return glucose;
     }
   },
   mounted() {
