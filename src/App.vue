@@ -67,7 +67,7 @@
               <v-col cols="12" >
                 <v-card>
                   <v-card-text>
-                    <BloodGlucoseChart :readings="history" :amount-of-data-points="24" style="height: 300px"></BloodGlucoseChart>
+                    <BloodGlucoseChart :readings="history" :amount-of-data-points="30" style="height: 200px"></BloodGlucoseChart>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -84,6 +84,15 @@
                 <v-card>
                   <v-card-text>
                     <AverageDay :history="history"></AverageDay>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12">
+                <v-card>
+                  <v-card-text>
+                    <DailyBloodGlucoseChart :readings="history" :amount-of-data-points="12*24" style="height: 100px"></DailyBloodGlucoseChart>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -121,6 +130,7 @@ import MainValue from './components/MainValue.vue';
 import BloodGlucoseChart from './components/BloodGlucoseChart.vue';
 import InRangeDay from './components/InRangeDay.vue';
 import AverageDay from './components/AverageDay.vue';
+import DailyBloodGlucoseChart from './components/DailyBloodGlucoseChart.vue';
 
 const Client = require('./dexcom.js');
 

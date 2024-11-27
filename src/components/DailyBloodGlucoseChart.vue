@@ -39,7 +39,7 @@ const horizontalLinePlugin = {
 };
 
 export default {
-  name: 'BloodGlucoseChart',
+  name: 'DailyBloodGlucoseChart',
   components: {
     Line
   },
@@ -66,30 +66,22 @@ export default {
             type: 'time',
             time: {
               unit: "hour", // Display ticks every hour
-              displayFormats: {
-                hour: "HH:mm", // Custom format for hours
-              },
             },
             ticks: {
-              maxTicksLimit: 10,
-              stepSize: 0.5,
-            },
-            grid: {
-              drawTicks: true, // Ensures tick marks align with grid lines
-              color: "#666666", // Vertical grid line color
-            },
+              display: false
+            }
           },
           y: {
-            suggestedMin: optimalMin,
-            suggestedMax: optimalMax,
+            ticks: {
+              // display: false
+            }
           }
         },
         maintainAspectRatio: false,
         horizontalLines: [
-          { y: optimalMin, color: "red", lineWidth: 2, dash: [5, 5] },
-          { y: optimalMax, color: "orange", lineWidth: 2, dash: [5, 5] },
+          { y: optimalMin, color: "red", lineWidth: 0.5, dash: [5, 5] },
+          { y: optimalMax, color: "orange", lineWidth: 0.5, dash: [5, 5] },
         ],
-
       }
     };
   },
@@ -110,11 +102,7 @@ export default {
 
       // Extract times and glucose values from the readings prop
       const times = newReadings.map((reading) => reading.time);
-      const glucoseValues = newReadings.map((reading) => this.getActualReading(reading.mmol));
-      const colors = newReadings.map((reading) => this.getColorForReading(reading.mmol));
-
-      // this.chartOptions.scales.y.min = Math.max(...glucoseValues) < optimalMax ? optimalMax : maxValue;
-      // this.chartOptions.scales.y.max = Math.min(...glucoseValues) > optimalMin ? optimalMin : minValue;
+      const glucoseValues = newReadings.map((reading) => reading.mmol);
 
       // Set chartData with proper structure
       this.chartData = {
@@ -122,26 +110,15 @@ export default {
         datasets: [
           {
             data: glucoseValues,
-            pointRadius: 3, // Increase the size of the points
-            pointBackgroundColor: colors
+            pointRadius: 0,
+            borderColor: "#CCCCCC",
+            borderWidth: 2,
+            tension: 0.5,
           }
         ]
       };
     },
     // Determine the color based on whether the reading is in range
-    getColorForReading(glucose) {
-      if (glucose <= minValue) {
-        return '#660000';
-      } else if (glucose < optimalMin) {
-        return 'red';
-      } else if (glucose > maxValue) {
-        return '#603B00';
-      } else if (glucose >= optimalMax) {
-        return 'orange';
-      } else {
-        return 'lightgreen';
-      }
-    },
     getActualReading(glucose) {
       if (glucose < minValue) {
         return minValue;
