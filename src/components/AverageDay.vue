@@ -49,9 +49,9 @@ export default {
 <style scoped>
 .muted {
     opacity: 0.5;
-    font-size: .8em;
+    font-size: .9em;
 }
 .large {
-    font-size: 2em;
+    font-size: 2.5em;
 }
 </style>

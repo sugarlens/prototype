@@ -2,23 +2,14 @@
   <v-app dark>
     <v-main>
       <v-container style="height: 100vh;">
-        <v-card v-if="!isLoggedIn" width="400">
+        <!-- LOGIN -->
+        <v-card v-if="!credentialsProvided">
           <v-card-title>Login</v-card-title>
           <v-card-text>
+            <p class="mb-2">Insert here the Dexcom Follow data:</p>
             <v-form ref="loginForm" v-model="valid">
-              <v-text-field
-                v-model="username"
-                label="Username"
-                :rules="[rules.required]"
-                required
-              ></v-text-field>
-              <v-text-field
-                v-model="password"
-                label="Password"
-                :rules="[rules.required]"
-                type="password"
-                required
-              ></v-text-field>
+              <v-text-field v-model="username" label="Username" :rules="[rules.required]" required></v-text-field>
+              <v-text-field v-model="password" label="Password" :rules="[rules.required]" type="password" required></v-text-field>
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -28,7 +19,13 @@
           </v-card-actions>
         </v-card>
 
-        <div v-if="isLoggedIn" class="d-flex flex-column fill-height">
+        <!-- LOADING -->
+        <div v-if="(isLoggedIn || credentialsProvided) && !dataRetrieved" class="text-center" style="height: 100%; padding: 10%">
+          <v-progress-circular color="primary" indeterminate :size="64"></v-progress-circular>
+        </div>
+
+        <!-- ACTUAL CONTENT -->
+        <div v-if="isLoggedIn && dataRetrieved" class="d-flex flex-column fill-height">
           <v-row class="flex-grow-0">
             <v-col cols="12">
               <MainValue :history="history"></MainValue>
@@ -37,14 +34,14 @@
 
           <!-- HORIZONTAL LAYOUT -->
           <v-row v-if="isHorizontal" class="d-flex">
-            <v-col cols="10" class="d-flex align-stretch">
+            <v-col cols="9" class="d-flex align-stretch">
               <v-card class="w-100 d-flex">
                 <v-card-text class="flex-grow-1">
                   <BloodGlucoseChart :readings="history"></BloodGlucoseChart>
                 </v-card-text>
               </v-card>
             </v-col>
-            <v-col cols="2">
+            <v-col cols="3">
               <v-row>
                 <v-col cols="12">
                   <v-card>
@@ -70,7 +67,7 @@
               <v-col cols="12" >
                 <v-card>
                   <v-card-text>
-                    <BloodGlucoseChart :readings="history"></BloodGlucoseChart>
+                    <BloodGlucoseChart :readings="history" :amount-of-data-points="24" style="height: 300px"></BloodGlucoseChart>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -100,14 +97,21 @@
 
 
 <script setup>
-import { computed } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 // Detect screen orientation
-const isHorizontal = computed(() => window.innerWidth > window.innerHeight);
+const isHorizontal = ref(window.innerHeight < window.innerWidth);
 
-// Update on resize
-window.addEventListener("resize", () => {
-  isHorizontal.value = window.innerWidth > window.innerHeight;
+function updateOrientation() {
+  isHorizontal.value = window.innerHeight < window.innerWidth;
+}
+
+onMounted(() => {
+  window.addEventListener('resize', updateOrientation);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateOrientation);
 });
 </script>
 
@@ -130,7 +134,9 @@ export default {
       username: '',
       password: '',
       valid: false,
+      credentialsProvided: false,
       isLoggedIn: false,
+      dataRetrieved: false,
       dexcomClient: null,
       history: [
         {"time": "2024-11-26 14:00", "mmol":1.9, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
@@ -178,9 +184,10 @@ export default {
   },
   created() {
     this.dexcomClient = new Client(true);
-    // Check for existing credentials in localStorage
+    // Check for existing credent.ials in localStorage
     const storedCredentials = localStorage.getItem('userCredentials');
     if (storedCredentials) {
+      this.credentialsProvided = true;
       const credentials = JSON.parse(atob(storedCredentials));
       this.username = credentials.username;
       this.password = credentials.password;
@@ -191,6 +198,7 @@ export default {
     handleLogin() {
       const credentials = btoa(JSON.stringify({ username: this.username, password: this.password }));
       localStorage.setItem('userCredentials', credentials);
+      this.credentialsProvided = true;
       this.login();
     },
     async login() {
@@ -218,6 +226,7 @@ export default {
       this.dexcomClient.fetchReadings(60*24, 12*24).then(
         (data) => {
           this.history = data.reverse();
+          this.dataRetrieved = true;
         }
       );
     },

@@ -47,6 +47,10 @@ export default {
     readings: {
       type: Array,
       required: true
+    },
+    amountOfDataPoints: {
+      type: Number,
+      default: 12*3
     }
   },
   setup() {
@@ -110,7 +114,7 @@ export default {
         return;
       }
 
-      var newReadings = readings.slice(-12*3);
+      var newReadings = readings.slice(-this.amountOfDataPoints);
 
       // Extract times and glucose values from the readings prop
       const times = newReadings.map((reading) => reading.time);
@@ -123,7 +127,7 @@ export default {
         datasets: [
           {
             data: glucoseValues,
-            pointRadius: 5, // Increase the size of the points
+            pointRadius: 3, // Increase the size of the points
             pointBackgroundColor: colors
           }
         ]
