@@ -1,9 +1,5 @@
 <template>
-  <v-card>
-    <v-card-text style="height: 100%">
-      <Line v-if="chartData" :data="chartData" :options="chartOptions"></Line>
-    </v-card-text>
-  </v-card>
+  <Line v-if="chartData" :data="chartData" :options="chartOptions"></Line>
 </template>
   
 <script>
@@ -114,10 +110,12 @@ export default {
         return;
       }
 
+      var newReadings = readings.slice(-12*3);
+
       // Extract times and glucose values from the readings prop
-      const times = readings.map((reading) => reading.time);
-      const glucoseValues = readings.map((reading) => this.getActualReading(reading.mmol));
-      const colors = readings.map((reading) => this.getColorForReading(reading.mmol));
+      const times = newReadings.map((reading) => reading.time);
+      const glucoseValues = newReadings.map((reading) => this.getActualReading(reading.mmol));
+      const colors = newReadings.map((reading) => this.getColorForReading(reading.mmol));
 
       // Set chartData with proper structure
       this.chartData = {

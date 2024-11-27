@@ -1,7 +1,7 @@
 <template>
   <v-app dark>
     <v-main>
-      <v-container style="height: 100vh">
+      <v-container style="height: 100vh;">
         <v-card v-if="!isLoggedIn" width="400">
           <v-card-title>Login</v-card-title>
           <v-card-text>
@@ -27,26 +27,96 @@
             </v-btn>
           </v-card-actions>
         </v-card>
-        <div v-else class="d-flex flex-column fill-height">
-          <v-row>
+
+        <div v-if="isLoggedIn" class="d-flex flex-column fill-height">
+          <v-row class="flex-grow-0">
             <v-col cols="12">
-              <MainValue :history="this.history"></MainValue>
+              <MainValue :history="history"></MainValue>
             </v-col>
           </v-row>
-          <v-row class="fill-height" style="flex-grow: 1;">
-            <v-col cols="12" class="d-flex flex-column">
-              <BloodGlucoseChart :readings="this.history" style="flex-grow: 1; width:100%;"></BloodGlucoseChart>
+
+          <!-- HORIZONTAL LAYOUT -->
+          <v-row v-if="isHorizontal" class="d-flex">
+            <v-col cols="10" class="d-flex align-stretch">
+              <v-card class="w-100 d-flex">
+                <v-card-text class="flex-grow-1">
+                  <BloodGlucoseChart :readings="history"></BloodGlucoseChart>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col cols="2">
+              <v-row>
+                <v-col cols="12">
+                  <v-card>
+                    <v-card-text>
+                      <InRangeDay :history="history"></InRangeDay>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+                <v-col cols="12">
+                  <v-card>
+                    <v-card-text>
+                      <AverageDay :history="history"></AverageDay>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
+
+          <!-- VERTICAL LAYOUT -->
+          <div v-else class="mt-4 flex-grow-1">
+            <v-row>
+              <v-col cols="12" >
+                <v-card>
+                  <v-card-text>
+                    <BloodGlucoseChart :readings="history"></BloodGlucoseChart>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="6">
+                <v-card>
+                  <v-card-text>
+                    <InRangeDay :history="history"></InRangeDay>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="6">
+                <v-card>
+                  <v-card-text>
+                    <AverageDay :history="history"></AverageDay>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </div>
         </div>
       </v-container>
     </v-main>
   </v-app>
 </template>
 
+
+<script setup>
+import { computed } from 'vue';
+
+// Detect screen orientation
+const isHorizontal = computed(() => window.innerWidth > window.innerHeight);
+
+// Update on resize
+window.addEventListener("resize", () => {
+  isHorizontal.value = window.innerWidth > window.innerHeight;
+});
+</script>
+
+
 <script>
 import MainValue from './components/MainValue.vue';
 import BloodGlucoseChart from './components/BloodGlucoseChart.vue';
+import InRangeDay from './components/InRangeDay.vue';
+import AverageDay from './components/AverageDay.vue';
 
 const Client = require('./dexcom.js');
 
@@ -63,8 +133,8 @@ export default {
       isLoggedIn: false,
       dexcomClient: null,
       history: [
-        {"time": "2024-11-26 14:00", "mmol":2.2, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:05", "mmol":2.4, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:00", "mmol":1.9, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 14:05", "mmol":1.8, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
         {"time": "2024-11-26 14:10", "mmol":2.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
         {"time": "2024-11-26 14:15", "mmol":2.8, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
         {"time": "2024-11-26 14:20", "mmol":3, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
@@ -79,16 +149,16 @@ export default {
         {"time": "2024-11-26 15:05", "mmol":9.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
         {"time": "2024-11-26 15:10", "mmol":10.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
         {"time": "2024-11-26 15:15", "mmol":11.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        // {"time": "2024-11-26 15:20", "mmol":12.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        // {"time": "2024-11-26 15:25", "mmol":13.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        // {"time": "2024-11-26 15:30", "mmol":14.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        // {"time": "2024-11-26 15:35", "mmol":15.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        // {"time": "2024-11-26 15:40", "mmol":16.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        // {"time": "2024-11-26 15:45", "mmol":17.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        // {"time": "2024-11-26 15:50", "mmol":18.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        // {"time": "2024-11-26 15:55", "mmol":19.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        // {"time": "2024-11-26 16:00", "mmol":18, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        // {"time": "2024-11-26 16:05", "mmol":17, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:20", "mmol":12.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:25", "mmol":13.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:30", "mmol":14.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:35", "mmol":15.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:40", "mmol":16.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:45", "mmol":17.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:50", "mmol":18.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 15:55", "mmol":19.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:00", "mmol":18, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2024-11-26 16:05", "mmol":17, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
         {"time": "2024-11-26 16:10", "mmol":16, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
         {"time": "2024-11-26 16:15", "mmol":15, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
         {"time": "2024-11-26 16:20", "mmol":14, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
@@ -145,7 +215,7 @@ export default {
     },
     fetchData() {
       console.log(" - Fetching new data...");
-      this.dexcomClient.fetchReadings(180, 36).then(
+      this.dexcomClient.fetchReadings(60*24, 12*24).then(
         (data) => {
           this.history = data.reverse();
         }
@@ -154,12 +224,3 @@ export default {
   },
 };
 </script>
-
-<style>
-body {
-  margin: 0;
-  font-family: Roboto, sans-serif;
-}
-
-
-</style>
