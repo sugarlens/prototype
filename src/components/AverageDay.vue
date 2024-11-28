@@ -1,6 +1,6 @@
 <template>
     <div class="text-center">
-        <p class="muted">Avg - 24h</p>
+        <p class="muted vertical float-left">Avg - 24h</p>
         <p class="large">{{ average }}</p>
         <p class="muted">mmol/l</p>
     </div>
@@ -50,6 +50,11 @@ export default {
 .muted {
     opacity: 0.5;
     font-size: .9em;
+}
+.vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
 }
 .large {
     font-size: 2.5em;

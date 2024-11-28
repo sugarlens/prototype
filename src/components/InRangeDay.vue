@@ -1,7 +1,9 @@
 <template>
     <div class="text-center">
-        <p class="muted">Range - 24h</p>
-        <p class="large">{{ inRange }}%</p>
+        <p class="muted mb-4 float-left">Range - 24h</p>
+        <v-progress-circular :model-value="inRange" :size="70" :width="7">
+            <template v-slot:default><span class="value">{{ inRange }}%</span></template>
+        </v-progress-circular>
     </div>
 </template>
 
@@ -49,8 +51,11 @@ export default {
 .muted {
     opacity: 0.5;
     font-size: .9em;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
 }
-.large {
-    font-size: 2.5em;
+.value {
+    font-size: 1.5em;
 }
 </style>
