@@ -118,7 +118,7 @@ export default {
       const colors = newReadings.map((reading) => this.getColorForReading(reading.mmol));
 
       // prediction
-      const fullRegressionLine = this.doRegression(newReadings.slice(-12));
+      const fullRegressionLine = this.doRegression(newReadings.slice(-6));
 
       // Set chartData with proper structure
       this.chartData = {
@@ -126,18 +126,15 @@ export default {
         datasets: [
           {
             data: glucoseValues,
-            pointRadius: 3, // Increase the size of the points
+            pointRadius: 3,
             pointBackgroundColor: colors,
             borderColor: 'transparent',
           },
           {
-            data: fullRegressionLine, // Use computed regression points
-            // borderColor: 'rgba(255, 255, 255, 1)',
+            data: fullRegressionLine,
             borderColor: 'transparent',
-            borderWidth: 1,
-            borderDash: [0, 1], // Dashed regression line
             pointRadius: 4,
-            pointBackgroundColor: 'rgba(255, 255, 255, 0.2)', // Gray points for regression line
+            pointBackgroundColor: 'rgba(255, 255, 255, 0.2)',
           },
         ]
       };
@@ -193,10 +190,10 @@ export default {
     // Function to extrapolate future points based on regression result
     extendRegression(regressionResult, lastNormalizedTime, maxTime, minTime) {
       const futurePoints = [];
-      const futureInterval = 0.1; // Step size for generating future points
+      const futureInterval = 0.2; // Step size for generating future points
       
-      // Extend the regression for the next 30 minutes (normalized)
-      for (let i = 1; i <= 3; i++) {
+      // Extend the regression for the future
+      for (let i = 2; i <= 4; i++) {
         const futureNormalizedTime = lastNormalizedTime + (i * futureInterval);  // Increment in normalized units
         const futureY = this.predictValue(regressionResult.equation, futureNormalizedTime);
         
