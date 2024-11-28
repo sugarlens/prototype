@@ -2,7 +2,7 @@
     <v-card>
         <v-card-text>
             <div class="float-right text-end class-muted">
-                <p>{{ prepareMoment(latestEntry.time).fromNow() }}</p>
+                <p>{{ now }}</p>
                 <p v-if="latestEntry && secondLatestEntry">Delta: {{ delta }} mmol/l</p>
             </div>
             <p :class="{'large-text': true, 'stale': isReadingStale}">{{ latestEntry.mmol.toFixed(1) }} {{ latestEntry.trend.arrow }}</p>
@@ -24,10 +24,15 @@ export default {
             ]
         }
     },
+    data() {
+        return {
+            now: "&nbsp;",
+        };
+    },
     methods: {
-        prepareMoment(t) {
-            return moment(t);
-        }
+        updateNow() {
+            this.now = moment(this.history[this.history.length - 1].time).fromNow();
+        },
     },
     computed: {
         latestEntry() {
@@ -46,8 +51,14 @@ export default {
             const fifteenMinutesAgo = moment().subtract(15, 'minute');
             return moment(this.latestEntry.time).isBefore(fifteenMinutesAgo);
         }
-
-    }
+    },
+    mounted() {
+        this.updateNow();
+        this.timer = setInterval(this.updateNow, 10*1000);
+    },
+    beforeUnmount() {
+        clearInterval(this.timer);
+    },
 }
 </script>
 
