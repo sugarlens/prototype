@@ -113,9 +113,6 @@ export default {
       const glucoseValues = newReadings.map((reading) => this.getActualReading(reading.mmol));
       const colors = newReadings.map((reading) => this.getColorForReading(reading.mmol));
 
-      // this.chartOptions.scales.y.min = Math.max(...glucoseValues) < optimalMax ? optimalMax : maxValue;
-      // this.chartOptions.scales.y.max = Math.min(...glucoseValues) > optimalMin ? optimalMin : minValue;
-
       // Set chartData with proper structure
       this.chartData = {
         labels: times,
@@ -123,7 +120,8 @@ export default {
           {
             data: glucoseValues,
             pointRadius: 3, // Increase the size of the points
-            pointBackgroundColor: colors
+            pointBackgroundColor: colors,
+            borderColor: 'transparent',
           }
         ]
       };
