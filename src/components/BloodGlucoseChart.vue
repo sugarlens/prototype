@@ -211,7 +211,13 @@ export default {
     },
     predictValue(equation, x) {
       // Linear equation: y = m * x + b
-      return equation[0] * x + equation[1];
+      var value = equation[0] * x + equation[1];
+      if (value < 2) {
+        return 2
+      } else if (value > 20) {
+        return 20;
+      }
+      return value;
     }
   },
   mounted() {
