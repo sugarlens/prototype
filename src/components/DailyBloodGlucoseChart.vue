@@ -66,10 +66,18 @@ export default {
             type: 'time',
             time: {
               unit: "hour", // Display ticks every hour
+              displayFormats: {
+                hour: "HH:mm", // Custom format for hours
+              },
             },
             ticks: {
-              display: false
-            }
+              maxTicksLimit: 10,
+              stepSize: 6,
+            },
+            grid: {
+              drawTicks: true, // Ensures tick marks align with grid lines
+              color: "#666666", // Vertical grid line color
+            },
           },
           y: {
             ticks: {
