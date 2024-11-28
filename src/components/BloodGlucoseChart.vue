@@ -6,6 +6,7 @@
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
+import regression from 'regression';
 
 const minValue = 2;
 const maxValue = 17;
@@ -113,6 +114,9 @@ export default {
       const glucoseValues = newReadings.map((reading) => this.getActualReading(reading.mmol));
       const colors = newReadings.map((reading) => this.getColorForReading(reading.mmol));
 
+      // prediction
+      const fullRegressionLine = this.doRegression(newReadings.slice(-12));
+
       // Set chartData with proper structure
       this.chartData = {
         labels: times,
@@ -122,7 +126,16 @@ export default {
             pointRadius: 3, // Increase the size of the points
             pointBackgroundColor: colors,
             borderColor: 'transparent',
-          }
+          },
+          {
+            data: fullRegressionLine, // Use computed regression points
+            // borderColor: 'rgba(255, 255, 255, 1)',
+            borderColor: 'transparent',
+            borderWidth: 1,
+            borderDash: [0, 1], // Dashed regression line
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(255, 255, 255, 0.2)', // Gray points for regression line
+          },
         ]
       };
     },
@@ -147,6 +160,58 @@ export default {
         return maxValue;
       }
       return glucose;
+    },
+    doRegression(data) {
+      // Calculate regression points
+      // Normalize time: Map time to [0, 1]
+      const minTime = Math.min(...data.map((r) => new Date(r.time).getTime()));
+      const maxTime = Math.max(...data.map((r) => new Date(r.time).getTime()));
+      
+      const normalizedData = data.map((r) => [
+        (new Date(r.time).getTime() - minTime) / (maxTime - minTime), // Normalize time to [0, 1]
+        this.getActualReading(r.mmol),
+      ]);
+
+      // Perform regression (linear regression in this case)
+      const regressionResult = regression.linear(normalizedData);
+
+      // Predict future points
+      const lastTimeNormalized = (new Date(data[data.length - 1].time).getTime() - minTime) / (maxTime - minTime);
+      const futurePoints = this.extendRegression(regressionResult, lastTimeNormalized, maxTime, minTime);
+
+      // Extend the regression with future predictions and convert to actual time
+      // const regressionPoints = regressionResult.points.map(([normalizedTime, value]) => ({
+      //   x: new Date(minTime + normalizedTime * (maxTime - minTime)).toISOString(),
+      //   y: value,
+      // }));
+      // return [...regressionPoints, ...futurePoints];
+      return futurePoints;
+    },
+    // Function to extrapolate future points based on regression result
+    extendRegression(regressionResult, lastNormalizedTime, maxTime, minTime) {
+      const futurePoints = [];
+      const futureInterval = 0.1; // Step size for generating future points
+      
+      // Extend the regression for the next 30 minutes (normalized)
+      for (let i = 1; i <= 3; i++) {
+        const futureNormalizedTime = lastNormalizedTime + (i * futureInterval);  // Increment in normalized units
+        const futureY = this.predictValue(regressionResult.equation, futureNormalizedTime);
+        
+        // Convert the future normalized time back to real time (milliseconds)
+        const futureRealTime = minTime + futureNormalizedTime * (maxTime - minTime);
+
+        // Push the future point
+        futurePoints.push({
+          x: new Date(futureRealTime).toISOString(), // Convert back to ISO time string
+          y: futureY,
+        });
+      }
+
+      return futurePoints;
+    },
+    predictValue(equation, x) {
+      // Linear equation: y = m * x + b
+      return equation[0] * x + equation[1];
     }
   },
   mounted() {
