@@ -83,6 +83,9 @@ export default {
           y: {
             suggestedMin: optimalMin,
             suggestedMax: optimalMax,
+            grid: {
+              color: "transparent",
+            },
           }
         },
         maintainAspectRatio: false,

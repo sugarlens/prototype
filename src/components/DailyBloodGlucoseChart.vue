@@ -75,9 +75,9 @@ export default {
             },
           },
           y: {
-            ticks: {
-              // display: false
-            }
+            grid: {
+              color: "transparent",
+            },
           }
         },
         maintainAspectRatio: false,
