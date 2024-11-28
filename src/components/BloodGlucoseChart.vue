@@ -193,7 +193,7 @@ export default {
       const futureInterval = 0.2; // Step size for generating future points
       
       // Extend the regression for the future
-      for (let i = 2; i <= 4; i++) {
+      for (let i = 1; i <= 3; i++) {
         const futureNormalizedTime = lastNormalizedTime + (i * futureInterval);  // Increment in normalized units
         const futureY = this.predictValue(regressionResult.equation, futureNormalizedTime);
         
