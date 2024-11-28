@@ -117,7 +117,6 @@ function updateOrientation() {
 
 onMounted(() => {
   window.addEventListener('resize', updateOrientation);
-  window.scrollTo(0, 1); // Wait for the page to fully load, then scroll slightly to hide the address bar
 });
 
 onUnmounted(() => {

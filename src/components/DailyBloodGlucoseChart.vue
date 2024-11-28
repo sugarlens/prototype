@@ -15,28 +15,23 @@ const optimalMax = 10;
 // Register the necessary Chart.js components
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement);
 
-// Plugin to draw horizontal lines
-const horizontalLinePlugin = {
-  id: "horizontalLinePlugin",
-  beforeDraw(chart) {
-    // eslint-disable-next-line
-    const { ctx, chartArea: { top, bottom, left, right }, scales: { y } } = chart;
-    const lines = chart.options.horizontalLines || [];
+// Plugin to fill horizontal area
+const horizontalFillPlugin = {
+  id: "horizontalFill",
+  beforeDraw(chart, args, pluginOptions) {
+    const { ctx, chartArea, scales } = chart;
+    const { startValue, endValue, color } = pluginOptions;
 
-    lines.forEach((line) => {
-      const yPos = y.getPixelForValue(line.y);
-      ctx.save();
-      ctx.beginPath();
-      ctx.lineWidth = line.lineWidth || 1;
-      ctx.strokeStyle = line.color || "rgba(0, 0, 0, 0.5)";
-      ctx.setLineDash(line.dash || []); // For dashed lines
-      ctx.moveTo(left, yPos);
-      ctx.lineTo(right, yPos);
-      ctx.stroke();
-      ctx.restore();
-    });
+    const startY = scales.y.getPixelForValue(startValue);
+    const endY = scales.y.getPixelForValue(endValue);
+
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.fillRect(chartArea.left, endY, chartArea.width, startY - endY);
+    ctx.restore();
   },
 };
+
 
 export default {
   name: 'DailyBloodGlucoseChart',
@@ -54,7 +49,7 @@ export default {
     }
   },
   setup() {
-    ChartJS.register(horizontalLinePlugin);
+    ChartJS.register(horizontalFillPlugin);
   },
   data() {
     return {
@@ -86,10 +81,14 @@ export default {
           }
         },
         maintainAspectRatio: false,
-        horizontalLines: [
-          { y: optimalMin, color: "red", lineWidth: 0.5, dash: [5, 5] },
-          { y: optimalMax, color: "orange", lineWidth: 0.5, dash: [5, 5] },
-        ],
+        plugins: {
+          filler: true,
+          horizontalFill: {
+            color: "rgba(255, 255, 255, 0.15)",
+            startValue: optimalMin,
+            endValue: optimalMax,
+          },
+        },
       }
     };
   },
