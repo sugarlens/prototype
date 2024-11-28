@@ -131,6 +131,7 @@ import BloodGlucoseChart from './components/BloodGlucoseChart.vue';
 import InRangeDay from './components/InRangeDay.vue';
 import AverageDay from './components/AverageDay.vue';
 import DailyBloodGlucoseChart from './components/DailyBloodGlucoseChart.vue';
+import moment from 'moment';  
 
 const Client = require('./dexcom.js');
 
@@ -229,16 +230,20 @@ export default {
       // Set an interval to fetch data every minute (60,000 milliseconds)
       this.fetchInterval = setInterval(() => {
         this.fetchData();
-      }, 2*60000);
+      }, 60000);
     },
     fetchData() {
-      console.log(" - Fetching new data...");
-      this.dexcomClient.fetchReadings(60*24, 12*24).then(
-        (data) => {
-          this.history = data.reverse();
-          this.dataRetrieved = true;
-        }
-      );
+      
+      var seconds = moment().diff(moment(this.history[this.history.length-1].time), 'seconds');
+      if (seconds > 60*5) {
+        console.log(" - Fetching new data...");
+        this.dexcomClient.fetchReadings(60*24, 12*24).then(
+          (data) => {
+            this.history = data.reverse();
+            this.dataRetrieved = true;
+          }
+        );
+      }
     },
   },
 };
