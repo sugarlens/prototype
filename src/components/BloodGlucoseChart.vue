@@ -53,7 +53,7 @@ export default {
     },
     amountOfDataPoints: {
       type: Number,
-      default: 12*6
+      default: 12*3
     }
   },
   setup() {
