@@ -72,19 +72,20 @@ export function extendRegression(regressionResult, lastNormalizedTime, maxTime, 
 }
 
 export function getBestRegression(data) {
-    // var models = [];
-    // models.push(regression.linear(data));
-    // models.push(regression.polynomial(data, { order: 2 }));
-    // models.push(regression.polynomial(data, { order: 3 }));
+    var models = [];
+    models.push(regression.linear(data));
+    models.push(regression.polynomial(data, { order: 2 }));
+    models.push(regression.polynomial(data, { order: 3 }));
     // models.push(regression.exponential(data));
 
     // select model with the highest R^2 value
-    // var bestModel = models.reduce((best, model) => {
-    //   return model.r2 > best.r2 ? model : best;
-    // });
-    // return bestModel;
+    var bestModel = models.reduce((best, model) => {
+      return model.r2 > best.r2 ? model : best;
+    });
+    // console.log(bestModel);
+    return bestModel;
 
-    return regression.polynomial(data, { order: 3 });
+    // return regression.polynomial(data, { order: 2 });
 }
 
 export function predictValue(model, x) {
@@ -108,12 +109,22 @@ export function smoothData(glucoseData) {
 }
 
 export function calculatePointsForRegression(data, minPointsForRegression, maxPointsForRegression) {
-    const values = data.map(point => point.mmol);
-    var range = Math.max(...values) - Math.min(...values);
-    const maxRange = 5;
-    const minRange = 0.5;
-    range = Math.max(minRange, Math.min(range, maxRange));
-    return Math.round(maxPointsForRegression - ((range - minRange) / (maxRange - minRange)) * (maxPointsForRegression - minPointsForRegression));  
+    const values = data.map(point => point.mmol); // Extract glucose values
+    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+    const squaredDiffs = values.map(val => Math.pow(val - mean, 2));
+    var spread = Math.sqrt(squaredDiffs.reduce((sum, val) => sum + val, 0) / values.length);
+    // console.log(spread);
+    const maxSpread = 2; // Maximum spread threshold
+    const minSpread = 0.1; // Minimum spread threshold
+
+    // Clamp spread between minSpread and maxSpread
+    spread = Math.max(minSpread, Math.min(spread, maxSpread));
+
+    // Map spread to the range of points
+    return Math.round(
+        maxPointsForRegression - ((spread - minSpread) / (maxSpread - minSpread)) * (maxPointsForRegression - minPointsForRegression)
+    );
+
 }
   
 

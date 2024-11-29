@@ -99,11 +99,12 @@ export default {
 
       // prediction
       // compute how many points to use for the regression based on the spread of the data
-      const pointsForRegressionCheck = pointsForRegressionMin + Math.round((pointsForRegressionMax-pointsForRegressionMin)/2);
-      const pointsForRegression = calculatePointsForRegression(newReadings.slice(-pointsForRegressionCheck), pointsForRegressionMin, pointsForRegressionMax);
-      // const dataForPrediction = smoothedReadings.map((value, index) => ({ time: newReadings[index].time, mmol: value }));
-      // const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(dataForPrediction.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
-      const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(newReadings.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
+      const pointsForRegressionCheck = pointsForRegressionMin + Math.round((pointsForRegressionMax-pointsForRegressionMin)/2);      
+      const dataForPrediction = smoothedReadings.map((value, index) => ({ time: newReadings[index].time, mmol: parseFloat(value) }));
+      const pointsForRegression = calculatePointsForRegression(dataForPrediction.slice(-pointsForRegressionCheck), pointsForRegressionMin, pointsForRegressionMax);
+      const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(dataForPrediction.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
+      // const pointsForRegression = calculatePointsForRegression(newReadings.slice(-pointsForRegressionCheck), pointsForRegressionMin, pointsForRegressionMax);
+      // const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(newReadings.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
 
       // definition of labels as all times
       var times = [...newReadings.map((reading) => reading.time), ...futureRegressionPoints.map((point) => new Date(point.x))];

@@ -1,10 +1,10 @@
-# prototype
+# Sugarlens prototype
 
 ## How the data is processed
 
 The tools shows both the raw data and the data after a Kalman filter is applied. What is highlighed is the data AFTER the application of the filter.
 
-The prediction is based on a polynomial regression of order 3 computed on the raw data (now on the filtered one).
+The prediction is based on the regression model with highest R^2 among linear, polynomial degree 2, polynomial degree 3. The number of data points is selected by consideing the spread of the latest data (the higher the spread the less points considered). All this is computed on the data after the Kalman filter.
 
 ## Project setup
 ```
@@ -15,16 +15,3 @@ npm install
 ```
 npm run serve
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
