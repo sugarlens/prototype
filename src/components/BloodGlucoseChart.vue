@@ -6,13 +6,14 @@
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
-import { smoothData, getColorForReading, getActualReading, doRegression, horizontalLinePlugin, futureBackgroundPlugin } from './chartUtils';
+import { smoothData, getColorForReading, getActualReading, doRegression, horizontalLinePlugin, futureBackgroundPlugin, calculatePointsForRegression } from './chartUtils';
 
 const minValue = 2;
 const maxValue = 17;
 const optimalMin = 4;
 const optimalMax = 10;
-const pointsForRegression = 12;
+const pointsForRegressionMax = 18;
+const pointsForRegressionMin = 6;
 
 // Register the necessary Chart.js components
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, horizontalLinePlugin, futureBackgroundPlugin);
@@ -97,6 +98,9 @@ export default {
       const colorsSmoothedReadings = smoothedReadings.map((reading) => getColorForReading(reading, minValue, maxValue, optimalMin, optimalMax, 0.9));
 
       // prediction
+      // compute how many points to use for the regression based on the spread of the data
+      const pointsForRegressionCheck = pointsForRegressionMin + Math.round((pointsForRegressionMax-pointsForRegressionMin)/2);
+      const pointsForRegression = calculatePointsForRegression(newReadings.slice(-pointsForRegressionCheck), pointsForRegressionMin, pointsForRegressionMax);
       // const dataForPrediction = smoothedReadings.map((value, index) => ({ time: newReadings[index].time, mmol: value }));
       // const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(dataForPrediction.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
       const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(newReadings.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);

@@ -107,6 +107,16 @@ export function smoothData(glucoseData) {
     return glucoseData.map(point => kf.filter(point).toFixed(2));
 }
 
+export function calculatePointsForRegression(data, minPointsForRegression, maxPointsForRegression) {
+    const values = data.map(point => point.mmol);
+    var range = Math.max(...values) - Math.min(...values);
+    const maxRange = 5;
+    const minRange = 0.5;
+    range = Math.max(minRange, Math.min(range, maxRange));
+    return Math.round(maxPointsForRegression - ((range - minRange) / (maxRange - minRange)) * (maxPointsForRegression - minPointsForRegression));  
+}
+  
+
 
 // Plugin to fill horizontal area
 export const horizontalFillPlugin = {
