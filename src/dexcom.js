@@ -1,3 +1,8 @@
+/**
+ * Code from https://github.com/coderkearns/dexcom.
+ * This project is licensed under the MIT License - see the LICENSE file for details.
+ */
+
 const Client = (function () {
     /****** GLOBAL VARIABLES ******/
     const APP_ID = "d89443d2-327c-4a6f-89e5-496bbb0317db"
