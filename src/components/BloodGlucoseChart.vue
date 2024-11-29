@@ -6,7 +6,7 @@
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
-import { smoothData, getColorForReading, getActualReading, doRegression } from './chartUtils';
+import { smoothData, getColorForReading, getActualReading, doRegression, horizontalLinePlugin, futureBackgroundPlugin } from './chartUtils';
 
 const minValue = 2;
 const maxValue = 17;
@@ -15,30 +15,7 @@ const optimalMax = 10;
 const pointsForRegression = 12;
 
 // Register the necessary Chart.js components
-ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement);
-
-// Plugin to draw horizontal lines
-const horizontalLinePlugin = {
-  id: "horizontalLinePlugin",
-  beforeDraw(chart) {
-    // eslint-disable-next-line
-    const { ctx, chartArea: { top, bottom, left, right }, scales: { y } } = chart;
-    const lines = chart.options.horizontalLines || [];
-
-    lines.forEach((line) => {
-      const yPos = y.getPixelForValue(line.y);
-      ctx.save();
-      ctx.beginPath();
-      ctx.lineWidth = line.lineWidth || 1;
-      ctx.strokeStyle = line.color || "rgba(0, 0, 0, 0.5)";
-      ctx.setLineDash(line.dash || []); // For dashed lines
-      ctx.moveTo(left, yPos);
-      ctx.lineTo(right, yPos);
-      ctx.stroke();
-      ctx.restore();
-    });
-  },
-};
+ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, horizontalLinePlugin, futureBackgroundPlugin);
 
 export default {
   name: 'BloodGlucoseChart',
@@ -55,21 +32,18 @@ export default {
       default: 12*3
     }
   },
-  setup() {
-    ChartJS.register([ horizontalLinePlugin ]);
-  },
   data() {
     return {
-      chartData: null, // Initialize chartData as null
+      chartData: null,
       chartOptions: {
         responsive: true,
         scales: {
           x: {
             type: 'time',
             time: {
-              unit: "hour", // Display ticks every hour
+              unit: "hour",
               displayFormats: {
-                hour: "HH:mm", // Custom format for hours
+                hour: "HH:mm",
               },
             },
             ticks: {
@@ -77,8 +51,8 @@ export default {
               stepSize: 0.5,
             },
             grid: {
-              drawTicks: true, // Ensures tick marks align with grid lines
-              color: "#666666", // Vertical grid line color
+              drawTicks: true,
+              color: "#666666",
             },
           },
           y: {
@@ -94,6 +68,9 @@ export default {
           { y: optimalMin, color: "red", lineWidth: 2, dash: [5, 5] },
           { y: optimalMax, color: "orange", lineWidth: 2, dash: [5, 5] },
         ],
+        plugins: {
+          futureBackgroundPlugin: true
+        },
       }
     };
   },
@@ -115,14 +92,17 @@ export default {
       var smoothedReadings = smoothData(readings.map((reading) => reading.mmol)).slice(-this.amountOfDataPoints);
 
       // Extract times and glucose values from the readings prop
-      const times = newReadings.map((reading) => reading.time);
       const glucoseValues = newReadings.map((reading) => getActualReading(reading.mmol, minValue, maxValue));
       const colorsActualReadings = newReadings.map((reading) => getColorForReading(reading.mmol, minValue, maxValue, optimalMin, optimalMax, 0.3));
       const colorsSmoothedReadings = smoothedReadings.map((reading) => getColorForReading(reading, minValue, maxValue, optimalMin, optimalMax, 0.9));
 
       // prediction
       // const dataForPrediction = smoothedReadings.map((value, index) => ({ time: newReadings[index].time, mmol: value }));
+      // const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(dataForPrediction.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
       const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(newReadings.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
+
+      // definition of labels as all times
+      var times = [...newReadings.map((reading) => reading.time), ...futureRegressionPoints.map((point) => new Date(point.x))];
 
       // Set chartData with proper structure
       this.chartData = {
@@ -145,6 +125,7 @@ export default {
           },
           {
             // Regression line for past data
+            label: 'Past', // name is fixed so that the future background area is properly colored
             data: pastRegressionPoints,
             borderColor: 'rgba(255, 255, 255, 0.5)',
             borderWidth: 1,

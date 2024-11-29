@@ -42,7 +42,7 @@ export function doRegression(data, minValue, maxValue, pointsForRegression) {
     const futurePoints = extendRegression(regressionResult, lastTimeNormalized, maxTime, minTime, pointsForRegression);
 
     const regressionPoints = regressionResult.points.map(([normalizedTime, value]) => ({
-        x: new Date(minTime + normalizedTime * (maxTime - minTime)).toISOString(),
+        x: new Date(minTime + normalizedTime * (maxTime - minTime)),
         y: value,
     }));
     return [regressionPoints, futurePoints];
@@ -63,7 +63,7 @@ export function extendRegression(regressionResult, lastNormalizedTime, maxTime, 
 
         // Push the future point
         futurePoints.push({
-            x: new Date(futureRealTime).toISOString(), // Convert back to ISO time string
+            x: new Date(futureRealTime),
             y: futureY,
         });
     }
@@ -101,8 +101,8 @@ export function predictValue(model, x) {
 export function smoothData(glucoseData) {
     // Initialize the Kalman filter
     const kf = new KalmanFilter({
-        R: 1, // Measurement noise (lower = trusts sensor more)
-        Q: 2, // Process noise (higher = smoother trends)
+        R: 0.1, // Measurement noise (lower = trusts sensor more)
+        Q: 0.1, // Process noise (higher = smoother trends)
     });
     return glucoseData.map(point => kf.filter(point).toFixed(2));
 }
@@ -123,4 +123,45 @@ export const horizontalFillPlugin = {
         ctx.fillRect(chartArea.left, endY, chartArea.width, startY - endY);
         ctx.restore();
     },
+};
+
+// Plugin to draw horizontal lines
+export const horizontalLinePlugin = {
+    id: "horizontalLinePlugin",
+    beforeDraw(chart) {
+        // eslint-disable-next-line
+        const { ctx, chartArea: { top, bottom, left, right }, scales: { y } } = chart;
+        const lines = chart.options.horizontalLines || [];
+
+        lines.forEach((line) => {
+            const yPos = y.getPixelForValue(line.y);
+            ctx.save();
+            ctx.beginPath();
+            ctx.lineWidth = line.lineWidth || 1;
+            ctx.strokeStyle = line.color || "rgba(0, 0, 0, 0.5)";
+            ctx.setLineDash(line.dash || []); // For dashed lines
+            ctx.moveTo(left, yPos);
+            ctx.lineTo(right, yPos);
+            ctx.stroke();
+            ctx.restore();
+        });
+    },
+};
+
+export const futureBackgroundPlugin = {
+    id: 'futureBackgroundPlugin',
+    beforeDraw(chart) {
+        const { ctx, chartArea, scales } = chart;
+        const { top, bottom } = chartArea;
+        const xScale = scales.x;
+        const pastDataset = chart.data.datasets.find(dataset => dataset.label === 'Past');
+        const lastPastIndex = pastDataset?.data[pastDataset.data.length - 1]?.x;
+        const firstFutureX = xScale.getPixelForValue(lastPastIndex) + 5;
+        if (firstFutureX) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.fillRect(firstFutureX, top, chartArea.right - firstFutureX, bottom - top);
+            ctx.restore();
+        }
+    }
 };
