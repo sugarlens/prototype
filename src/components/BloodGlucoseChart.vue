@@ -12,6 +12,7 @@ const minValue = 2;
 const maxValue = 17;
 const optimalMin = 4;
 const optimalMax = 10;
+const pointsForRegression = 12;
 
 // Register the necessary Chart.js components
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement);
@@ -118,7 +119,7 @@ export default {
       const colors = newReadings.map((reading) => this.getColorForReading(reading.mmol));
 
       // prediction
-      const [ pastRegressionPoints, futureRegressionPoints ] = this.doRegression(newReadings.slice(-12));
+      const [ pastRegressionPoints, futureRegressionPoints ] = this.doRegression(newReadings.slice(-pointsForRegression));
 
       // Set chartData with proper structure
       this.chartData = {
@@ -193,7 +194,7 @@ export default {
     // Function to extrapolate future points based on regression result
     extendRegression(regressionResult, lastNormalizedTime, maxTime, minTime) {
       const futurePoints = [];
-      const futureInterval = 1/12; // Step size for generating future points
+      const futureInterval = 1/pointsForRegression; // Step size for generating future points
       
       // Extend the regression for the future
       for (let i = 1; i <= 3; i++) {
