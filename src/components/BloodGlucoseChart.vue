@@ -7,6 +7,7 @@ import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
 import regression from 'regression';
+import KalmanFilter from 'kalmanjs';
 
 const minValue = 2;
 const maxValue = 17;
@@ -52,11 +53,11 @@ export default {
     },
     amountOfDataPoints: {
       type: Number,
-      default: 12*3
+      default: 12*6
     }
   },
   setup() {
-    ChartJS.register(horizontalLinePlugin);
+    ChartJS.register([ horizontalLinePlugin ]);
   },
   data() {
     return {
@@ -94,7 +95,6 @@ export default {
           { y: optimalMin, color: "red", lineWidth: 2, dash: [5, 5] },
           { y: optimalMax, color: "orange", lineWidth: 2, dash: [5, 5] },
         ],
-
       }
     };
   },
@@ -111,14 +111,18 @@ export default {
         return;
       }
 
+      // Consider only the last amountOfDataPoints readings
       var newReadings = readings.slice(-this.amountOfDataPoints);
+      var smoothedReadings = this.smoothData(readings.map((reading) => reading.mmol)).slice(-this.amountOfDataPoints);
 
       // Extract times and glucose values from the readings prop
       const times = newReadings.map((reading) => reading.time);
       const glucoseValues = newReadings.map((reading) => this.getActualReading(reading.mmol));
-      const colors = newReadings.map((reading) => this.getColorForReading(reading.mmol));
+      const colorsActualReadings = newReadings.map((reading) => this.getColorForReading(reading.mmol, 0.3));
+      const colorsSmoothedReadings = smoothedReadings.map((reading) => this.getColorForReading(reading, 0.9));
 
       // prediction
+      // const dataForPrediction = smoothedReadings.map((value, index) => ({ time: newReadings[index].time, mmol: value }));
       const [ pastRegressionPoints, futureRegressionPoints ] = this.doRegression(newReadings.slice(-pointsForRegression));
 
       // Set chartData with proper structure
@@ -126,18 +130,30 @@ export default {
         labels: times,
         datasets: [
           {
+            // Raw glucose values
             data: glucoseValues,
-            pointRadius: 3,
-            pointBackgroundColor: colors,
+            pointRadius: 2,
+            pointBackgroundColor: colorsActualReadings,
             borderColor: 'transparent',
           },
           {
-            data: pastRegressionPoints,
-            borderColor: 'rgba(255, 255, 255, 0.3)',// 'transparent',
+            // Smoothed glucose values
+            data: smoothedReadings,
+            pointRadius: 3,
             borderWidth: 1,
-            pointRadius: 0,
+            pointBackgroundColor: colorsSmoothedReadings,
+            borderColor: 'transparent',
           },
           {
+            // Regression line for past data
+            data: pastRegressionPoints,
+            borderColor: 'rgba(255, 255, 255, 0.5)',
+            borderWidth: 1,
+            pointRadius: 0,
+            borderDash: [5, 2],
+          },
+          {
+            // Regression line for future data
             data: futureRegressionPoints,
             borderColor: 'transparent',
             borderWidth: 0,
@@ -148,17 +164,17 @@ export default {
       };
     },
     // Determine the color based on whether the reading is in range
-    getColorForReading(glucose) {
+    getColorForReading(glucose, alpha = 1) {
       if (glucose <= minValue) {
-        return '#660000';
+        return 'rgba(102,0,0, ' + alpha + ')';
       } else if (glucose < optimalMin) {
-        return 'red';
+        return 'rgba(255, 0, 0, ' + alpha + ')';
       } else if (glucose > maxValue) {
-        return '#603B00';
+        return 'rgba(96, 59, 0, ' + alpha + ')';
       } else if (glucose >= optimalMax) {
-        return 'orange';
+        return 'rgba(255, 165, 0, ' + alpha + ')';
       } else {
-        return 'lightgreen';
+        return 'rgba(144, 238, 144, ' + alpha + ')';
       }
     },
     getActualReading(glucose) {
@@ -215,10 +231,10 @@ export default {
     },
     getBestRegression(data) {
       var models = [];
-      models.push(regression.linear(data));
-      models.push(regression.polynomial(data, { order: 2 }));
+      // models.push(regression.linear(data));
+      // models.push(regression.polynomial(data, { order: 2 }));
       models.push(regression.polynomial(data, { order: 3 }));
-      models.push(regression.exponential(data));
+      // models.push(regression.exponential(data));
 
       // select model with the highest R^2 value
       var bestModel = models.reduce((best, model) => {
@@ -235,6 +251,14 @@ export default {
         return 20;
       }
       return value;
+    },
+    smoothData(glucoseData) {
+      // Initialize the Kalman filter
+      const kf = new KalmanFilter({
+        R: 1, // Measurement noise (lower = trusts sensor more)
+        Q: 2,    // Process noise (higher = smoother trends)
+      });
+      return glucoseData.map(point => kf.filter(point).toFixed(2));
     }
   },
   mounted() {
