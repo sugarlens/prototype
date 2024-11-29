@@ -133,6 +133,7 @@ import AverageDay from './components/AverageDay.vue';
 import DailyBloodGlucoseChart from './components/DailyBloodGlucoseChart.vue';
 import moment from 'moment';  
 
+// const Client = require('./dexcom-mock.js');
 const Client = require('./dexcom.js');
 
 export default {
@@ -150,42 +151,7 @@ export default {
       dataRetrieved: false,
       dexcomClient: null,
       history: [
-        {"time": "2024-11-26 14:00", "mmol":1.9, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:05", "mmol":1.8, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:10", "mmol":2.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:15", "mmol":2.8, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:20", "mmol":3, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:25", "mmol":3.2, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:30", "mmol":3.4, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:35", "mmol":3.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:40", "mmol":4.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:45", "mmol":5.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:50", "mmol":6.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 14:55", "mmol":7.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:00", "mmol":8.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:05", "mmol":9.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:10", "mmol":10.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:15", "mmol":11.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:20", "mmol":12.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:25", "mmol":13.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:30", "mmol":14.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:35", "mmol":15.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:40", "mmol":16.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:45", "mmol":17.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:50", "mmol":18.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 15:55", "mmol":19.6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:00", "mmol":18, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:05", "mmol":17, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:10", "mmol":16, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:15", "mmol":15, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:20", "mmol":14, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:25", "mmol":13, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:30", "mmol":12, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:35", "mmol":11, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:40", "mmol":10, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:45", "mmol":9.2, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:50", "mmol":9.1, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-        {"time": "2024-11-26 16:55", "mmol":8.7, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+        {"time": "2000-01-01 00:00", "mmol": 0, "trend": { "name": "", "desc": "", "arrow": "" }},
       ],
       rules: {
         required: value => !!value || 'This field is required',
@@ -233,7 +199,6 @@ export default {
       }, 60000);
     },
     fetchData() {
-      
       var seconds = moment().diff(moment(this.history[this.history.length-1].time), 'seconds');
       if (seconds > 60*5) {
         console.log(" - Fetching new data...");
