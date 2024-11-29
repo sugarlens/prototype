@@ -106,3 +106,21 @@ export function smoothData(glucoseData) {
     });
     return glucoseData.map(point => kf.filter(point).toFixed(2));
 }
+
+
+// Plugin to fill horizontal area
+export const horizontalFillPlugin = {
+    id: "horizontalFill",
+    beforeDraw(chart, args, pluginOptions) {
+        const { ctx, chartArea, scales } = chart;
+        const { startValue, endValue, color } = pluginOptions;
+
+        const startY = scales.y.getPixelForValue(startValue);
+        const endY = scales.y.getPixelForValue(endValue);
+
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.fillRect(chartArea.left, endY, chartArea.width, startY - endY);
+        ctx.restore();
+    },
+};

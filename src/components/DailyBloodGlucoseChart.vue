@@ -6,32 +6,13 @@
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
+import { horizontalFillPlugin } from './chartUtils.js';
 
-const minValue = 2;
-const maxValue = 17;
 const optimalMin = 4;
 const optimalMax = 10;
 
 // Register the necessary Chart.js components
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement);
-
-// Plugin to fill horizontal area
-const horizontalFillPlugin = {
-  id: "horizontalFill",
-  beforeDraw(chart, args, pluginOptions) {
-    const { ctx, chartArea, scales } = chart;
-    const { startValue, endValue, color } = pluginOptions;
-
-    const startY = scales.y.getPixelForValue(startValue);
-    const endY = scales.y.getPixelForValue(endValue);
-
-    ctx.save();
-    ctx.fillStyle = color;
-    ctx.fillRect(chartArea.left, endY, chartArea.width, startY - endY);
-    ctx.restore();
-  },
-};
-
 
 export default {
   name: 'DailyBloodGlucoseChart',
@@ -124,15 +105,6 @@ export default {
           }
         ]
       };
-    },
-    // Determine the color based on whether the reading is in range
-    getActualReading(glucose) {
-      if (glucose < minValue) {
-        return minValue;
-      } else if (glucose > maxValue) {
-        return maxValue;
-      }
-      return glucose;
     }
   },
   mounted() {
