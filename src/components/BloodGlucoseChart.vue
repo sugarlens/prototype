@@ -118,7 +118,7 @@ export default {
       const colors = newReadings.map((reading) => this.getColorForReading(reading.mmol));
 
       // prediction
-      const fullRegressionLine = this.doRegression(newReadings.slice(-6));
+      const [ pastRegressionPoints, futureRegressionPoints ] = this.doRegression(newReadings.slice(-12));
 
       // Set chartData with proper structure
       this.chartData = {
@@ -131,10 +131,17 @@ export default {
             borderColor: 'transparent',
           },
           {
-            data: fullRegressionLine,
+            data: pastRegressionPoints,
+            borderColor: 'rgba(255, 255, 255, 0.3)',// 'transparent',
+            borderWidth: 1,
+            pointRadius: 0,
+          },
+          {
+            data: futureRegressionPoints,
             borderColor: 'transparent',
-            pointRadius: 4,
-            pointBackgroundColor: 'rgba(255, 255, 255, 0.2)',
+            borderWidth: 0,
+            pointRadius: 3,
+            pointBackgroundColor: 'rgba(255, 255, 255, 0.5)',
           },
         ]
       };
@@ -161,41 +168,37 @@ export default {
       }
       return glucose;
     },
-    doRegression(data) {
+  doRegression(data) {
       // Calculate regression points
-      // Normalize time: Map time to [0, 1]
       const minTime = Math.min(...data.map((r) => new Date(r.time).getTime()));
       const maxTime = Math.max(...data.map((r) => new Date(r.time).getTime()));
-      
       const normalizedData = data.map((r) => [
-        (new Date(r.time).getTime() - minTime) / (maxTime - minTime), // Normalize time to [0, 1]
+        (new Date(r.time).getTime() - minTime) / (maxTime - minTime),
         this.getActualReading(r.mmol),
       ]);
 
-      // Perform regression (linear regression in this case)
-      const regressionResult = regression.linear(normalizedData);
+      // Train the regression model
+      const regressionResult = this.getBestRegression(normalizedData);
 
       // Predict future points
       const lastTimeNormalized = (new Date(data[data.length - 1].time).getTime() - minTime) / (maxTime - minTime);
       const futurePoints = this.extendRegression(regressionResult, lastTimeNormalized, maxTime, minTime);
 
-      // Extend the regression with future predictions and convert to actual time
-      // const regressionPoints = regressionResult.points.map(([normalizedTime, value]) => ({
-      //   x: new Date(minTime + normalizedTime * (maxTime - minTime)).toISOString(),
-      //   y: value,
-      // }));
-      // return [...regressionPoints, ...futurePoints];
-      return futurePoints;
+      const regressionPoints = regressionResult.points.map(([normalizedTime, value]) => ({
+        x: new Date(minTime + normalizedTime * (maxTime - minTime)).toISOString(),
+        y: value,
+      }));
+      return [ regressionPoints, futurePoints ];
     },
     // Function to extrapolate future points based on regression result
     extendRegression(regressionResult, lastNormalizedTime, maxTime, minTime) {
       const futurePoints = [];
-      const futureInterval = 0.2; // Step size for generating future points
+      const futureInterval = 1/12; // Step size for generating future points
       
       // Extend the regression for the future
       for (let i = 1; i <= 3; i++) {
         const futureNormalizedTime = lastNormalizedTime + (i * futureInterval);  // Increment in normalized units
-        const futureY = this.predictValue(regressionResult.equation, futureNormalizedTime);
+        const futureY = this.predictValue(regressionResult, futureNormalizedTime);
         
         // Convert the future normalized time back to real time (milliseconds)
         const futureRealTime = minTime + futureNormalizedTime * (maxTime - minTime);
@@ -209,9 +212,22 @@ export default {
 
       return futurePoints;
     },
-    predictValue(equation, x) {
+    getBestRegression(data) {
+      var models = [];
+      models.push(regression.linear(data));
+      models.push(regression.polynomial(data, { order: 2 }));
+      models.push(regression.polynomial(data, { order: 3 }));
+      models.push(regression.exponential(data));
+
+      // select model with the highest R^2 value
+      var bestModel = models.reduce((best, model) => {
+        return model.r2 > best.r2 ? model : best;
+      });
+      return bestModel;
+    },
+    predictValue(model, x) {
       // Linear equation: y = m * x + b
-      var value = equation[0] * x + equation[1];
+      var value = model.predict(x)[1];
       if (value < 2) {
         return 2
       } else if (value > 20) {
