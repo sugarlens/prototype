@@ -143,7 +143,7 @@ export default {
             borderColor: 'transparent',
             borderWidth: 0,
             pointRadius: 3,
-            pointBackgroundColor: 'rgba(255, 255, 255, 0.5)',
+            pointBackgroundColor: 'rgba(255, 255, 255, 0.25)',
           },
         ]
       };
