@@ -230,17 +230,19 @@ export default {
       return futurePoints;
     },
     getBestRegression(data) {
-      var models = [];
+      // var models = [];
       // models.push(regression.linear(data));
       // models.push(regression.polynomial(data, { order: 2 }));
-      models.push(regression.polynomial(data, { order: 3 }));
+      // models.push(regression.polynomial(data, { order: 3 }));
       // models.push(regression.exponential(data));
 
       // select model with the highest R^2 value
-      var bestModel = models.reduce((best, model) => {
-        return model.r2 > best.r2 ? model : best;
-      });
-      return bestModel;
+      // var bestModel = models.reduce((best, model) => {
+      //   return model.r2 > best.r2 ? model : best;
+      // });
+      // return bestModel;
+
+      return regression.polynomial(data, { order: 3 });
     },
     predictValue(model, x) {
       // Linear equation: y = m * x + b
