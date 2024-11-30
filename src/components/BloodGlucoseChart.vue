@@ -13,7 +13,7 @@ const maxValue = 17;
 const optimalMin = 4;
 const optimalMax = 10;
 const pointsForRegressionMax = 18;
-const pointsForRegressionMin = 6;
+const pointsForRegressionMin = 3;
 
 // Register the necessary Chart.js components
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, horizontalLinePlugin, futureBackgroundPlugin);
