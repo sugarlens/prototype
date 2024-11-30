@@ -114,7 +114,7 @@ export function calculatePointsForRegression(data, minPointsForRegression, maxPo
     const squaredDiffs = values.map(val => Math.pow(val - mean, 2));
     var spread = Math.sqrt(squaredDiffs.reduce((sum, val) => sum + val, 0) / values.length);
     // console.log(spread);
-    const maxSpread = 2; // Maximum spread threshold
+    const maxSpread = 1; // Maximum spread threshold
     const minSpread = 0.1; // Minimum spread threshold
 
     // Clamp spread between minSpread and maxSpread
