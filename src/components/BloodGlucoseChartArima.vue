@@ -72,7 +72,8 @@ export default {
         plugins: {
           futureBackgroundPlugin: true
         },
-      }
+      },
+      futureARIMAPoints: [],
     };
   },
   watch: {
@@ -97,24 +98,33 @@ export default {
       const colorsActualReadings = newReadings.map((reading) => getColorForReading(reading.mmol, minValue, maxValue, optimalMin, optimalMax, 0.3));
       const colorsSmoothedReadings = smoothedReadings.map((reading) => getColorForReading(reading, minValue, maxValue, optimalMin, optimalMax, 0.9));
 
-      // prediction
+      // Regression prediction
       // compute how many points to use for the regression based on the spread of the data
       const pointsForRegressionCheck = pointsForRegressionMin + Math.round((pointsForRegressionMax-pointsForRegressionMin)/2);      
       const dataForPrediction = smoothedReadings.map((value, index) => ({ time: newReadings[index].time, mmol: parseFloat(value) }));
       const pointsForRegression = calculatePointsForRegression(dataForPrediction.slice(-pointsForRegressionCheck), pointsForRegressionMin, pointsForRegressionMax);
       const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(dataForPrediction.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
 
-      const lastTime = newReadings[newReadings.length - 1].time;
-      const ARIMAPredictions = await this.buildPredictionModel(readings.map((reading) => reading.mmol).slice(-100));
-      const futureARIMAPoints = ARIMAPredictions.map((value, index) => ({
+      // ARIMA prediction
+      // await this.buildPredictionModel(readings.map((reading) => reading.mmol).slice(-100)).then((predictions) => {
+      //   const lastTime = readings[readings.length - 1].time;
+      //   this.futureARIMAPoints = predictions.map((value, index) => ({
+      //     x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
+      //     y: getActualReading(value, minValue, maxValue).toFixed(2)
+      //   }));
+
+      //   this.$refs.chartRef.chart.update();
+      //   // console.log(this.futureARIMAPoints);
+      // });
+      const lastTime = readings[readings.length - 1].time;
+      const ARIMAPredictions = await this.buildPredictionModel(readings.map((reading) => reading.mmol).slice(-50));
+      this.futureARIMAPoints = ARIMAPredictions.map((value, index) => ({
         x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
         y: getActualReading(value, minValue, maxValue)
       }));
-      console.log(futureARIMAPoints)
 
       // definition of labels as all times
       var times = [...newReadings.map((reading) => reading.time), ...futureRegressionPoints.map((point) => new Date(point.x))];
-      // var times = [...newReadings.map((reading) => reading.time)];
 
       // Set chartData with proper structure
       this.chartData = {
@@ -154,7 +164,8 @@ export default {
           },
           {
             // Regression line for future data
-            data: futureARIMAPoints,
+            label: 'ARIMA',
+            data: this.futureARIMAPoints,
             borderColor: 'transparent',
             borderWidth: 0,
             pointRadius: 3,
@@ -173,7 +184,7 @@ export default {
       }
       return Math.sqrt(sumSquaredError / n); // Return RMSE
     },
-    buildPredictionModel(data, trainingIterations = 30) {
+    buildPredictionModel(data, trainingIterations = 20) {
       const ARIMAPromise = require('arima/async')
       return ARIMAPromise.then(ARIMA => {
         let bestModel = null;
@@ -183,9 +194,9 @@ export default {
         for (let e = 0; e < trainingIterations; e++) {
           // Initialize and train the ARIMA model with current parameters
           const params = {
-            p: Math.round(12 * Math.random()),
-            d: Math.round(3 * Math.random()),
-            q: Math.round(6 * Math.random()),
+            p: Math.round(11 * Math.random()),
+            d: Math.round(2 * Math.random()),
+            q: Math.round(5 * Math.random()),
             method: 0,
             verbose: false,
           };
@@ -194,7 +205,7 @@ export default {
           const predictions = arima.predict(3);
           const actual = data.slice(-3);
           const error = this.evaluateModel(actual, predictions[0]);
-          console.log(`Tested (p=${params.p}, d=${params.d}, q=${params.q}) - RMSE: ${error}`);
+          console.log(`Tested p=\t${params.p}\td=\t${params.d}\tq=\t${params.q}\tRMSE=\t${error}`);
           if (error < bestError) {
             bestError = error;
             bestParams = params;
