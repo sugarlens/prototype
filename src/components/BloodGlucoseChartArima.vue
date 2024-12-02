@@ -1,0 +1,235 @@
+<template>
+  <Line v-if="chartData" :data="chartData" :options="chartOptions"></Line>
+</template>
+  
+<script>
+import { Line } from 'vue-chartjs';
+import 'chartjs-adapter-moment';
+import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
+import { smoothData, getColorForReading, getActualReading, doRegression, horizontalLinePlugin, futureBackgroundPlugin, calculatePointsForRegression } from './chartUtils';
+
+const minValue = 2;
+const maxValue = 17;
+const optimalMin = 4;
+const optimalMax = 10;
+const pointsForRegressionMax = 18;
+const pointsForRegressionMin = 6;
+
+// Register the necessary Chart.js components
+ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, horizontalLinePlugin, futureBackgroundPlugin);
+
+export default {
+  name: 'BloodGlucoseChartArima',
+  components: {
+    Line
+  },
+  props: {
+    readings: {
+      type: Array,
+      required: true
+    },
+    amountOfDataPoints: {
+      type: Number,
+      default: 12*3
+    }
+  },
+  data() {
+    return {
+      chartData: null,
+      chartOptions: {
+        responsive: true,
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: "hour",
+              displayFormats: {
+                hour: "HH:mm",
+              },
+            },
+            ticks: {
+              maxTicksLimit: 10,
+              stepSize: 0.5,
+            },
+            grid: {
+              drawTicks: true,
+              color: "#666666",
+            },
+          },
+          y: {
+            suggestedMin: optimalMin,
+            suggestedMax: optimalMax,
+            grid: {
+              color: "transparent",
+            },
+          }
+        },
+        maintainAspectRatio: false,
+        horizontalLines: [
+          { y: optimalMin, color: "red", lineWidth: 2, dash: [5, 5] },
+          { y: optimalMax, color: "orange", lineWidth: 2, dash: [5, 5] },
+        ],
+        plugins: {
+          futureBackgroundPlugin: true
+        },
+      }
+    };
+  },
+  watch: {
+    // Watch for changes in the readings prop and update chartData accordingly
+    readings(newReadings) {
+      this.updateChartData(newReadings);
+    }
+  },
+  methods: {
+    async updateChartData(readings) {
+      // Check if the readings array is not empty
+      if (!readings || readings.length === 0) {
+        return;
+      }
+
+      // Consider only the last amountOfDataPoints readings
+      var newReadings = readings.slice(-this.amountOfDataPoints);
+      var smoothedReadings = smoothData(readings.map((reading) => reading.mmol)).slice(-this.amountOfDataPoints);
+
+      // Extract times and glucose values from the readings prop
+      const glucoseValues = newReadings.map((reading) => getActualReading(reading.mmol, minValue, maxValue));
+      const colorsActualReadings = newReadings.map((reading) => getColorForReading(reading.mmol, minValue, maxValue, optimalMin, optimalMax, 0.3));
+      const colorsSmoothedReadings = smoothedReadings.map((reading) => getColorForReading(reading, minValue, maxValue, optimalMin, optimalMax, 0.9));
+
+      // prediction
+      // compute how many points to use for the regression based on the spread of the data
+      const pointsForRegressionCheck = pointsForRegressionMin + Math.round((pointsForRegressionMax-pointsForRegressionMin)/2);      
+      const dataForPrediction = smoothedReadings.map((value, index) => ({ time: newReadings[index].time, mmol: parseFloat(value) }));
+      const pointsForRegression = calculatePointsForRegression(dataForPrediction.slice(-pointsForRegressionCheck), pointsForRegressionMin, pointsForRegressionMax);
+      const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(dataForPrediction.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
+
+      const lastTime = newReadings[newReadings.length - 1].time;
+      const ARIMAPredictions = await this.buildPredictionModel(readings.map((reading) => reading.mmol).slice(-100));
+      const futureARIMAPoints = ARIMAPredictions.map((value, index) => ({
+        x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
+        y: getActualReading(value, minValue, maxValue)
+      }));
+      console.log(futureARIMAPoints)
+
+      // definition of labels as all times
+      var times = [...newReadings.map((reading) => reading.time), ...futureRegressionPoints.map((point) => new Date(point.x))];
+      // var times = [...newReadings.map((reading) => reading.time)];
+
+      // Set chartData with proper structure
+      this.chartData = {
+        labels: times,
+        datasets: [
+          {
+            // Raw glucose values
+            data: glucoseValues,
+            pointRadius: 2,
+            pointBackgroundColor: colorsActualReadings,
+            borderColor: 'transparent',
+          },
+          {
+            // Smoothed glucose values
+            label: 'Past', // name is fixed so that the future background area is properly colored
+            data: smoothedReadings,
+            pointRadius: 3,
+            borderWidth: 1,
+            pointBackgroundColor: colorsSmoothedReadings,
+            borderColor: 'transparent',
+          },
+          {
+            // Regression line for past data
+            data: pastRegressionPoints,
+            borderColor: 'rgba(255, 255, 255, 0.5)',
+            borderWidth: 1,
+            pointRadius: 0,
+            borderDash: [5, 2],
+          },
+          {
+            // Regression line for future data
+            data: futureRegressionPoints,
+            borderColor: 'transparent',
+            borderWidth: 0,
+            pointRadius: 3,
+            pointBackgroundColor: 'rgba(255, 255, 255, 0.5)',
+          },
+          {
+            // Regression line for future data
+            data: futureARIMAPoints,
+            borderColor: 'transparent',
+            borderWidth: 0,
+            pointRadius: 3,
+            pointBackgroundColor: 'rgba(255, 255, 0, 0.75)',
+          },
+        ]
+      };
+    },
+    evaluateModel(actual, predicted) {
+      const n = actual.length;
+      let sumSquaredError = 0;
+
+      for (let i = 0; i < n; i++) {
+        sumSquaredError += Math.pow(actual[i] - predicted[i], 2);
+        // console.log(`Actual: ${actual[i]}, Predicted: ${predicted[i]}`);
+      }
+      return Math.sqrt(sumSquaredError / n); // Return RMSE
+    },
+    buildPredictionModel(data, trainingIterations = 30) {
+      const ARIMAPromise = require('arima/async')
+      return ARIMAPromise.then(ARIMA => {
+        let bestModel = null;
+        let bestError = Infinity;
+        let bestParams = null;
+
+        for (let e = 0; e < trainingIterations; e++) {
+          // Initialize and train the ARIMA model with current parameters
+          const params = {
+            p: Math.round(12 * Math.random()),
+            d: Math.round(3 * Math.random()),
+            q: Math.round(6 * Math.random()),
+            method: 0,
+            verbose: false,
+          };
+          const arima = new ARIMA(params);
+          arima.train(data.slice(0, -3)); // Train the model with all data except the last 10 points
+          const predictions = arima.predict(3);
+          const actual = data.slice(-3);
+          const error = this.evaluateModel(actual, predictions[0]);
+          console.log(`Tested (p=${params.p}, d=${params.d}, q=${params.q}) - RMSE: ${error}`);
+          if (error < bestError) {
+            bestError = error;
+            bestParams = params;
+            bestModel = arima;
+          }
+        }
+
+        if (bestModel) {
+          console.log("Best ARIMA model found!", bestParams);
+          const arima = new ARIMA(bestParams);
+          arima.train(data);
+          // eslint-disable-next-line
+          const [ predictions, errors ] = arima.predict(3);
+          console.log("Predictions: ", predictions);
+          return predictions;
+        }
+        return [];
+      })
+    }
+  },
+  mounted() {
+    // Initialize chartData when the component is mounted
+    this.updateChartData(this.readings);
+  }
+};
+</script>
+  
+<style scoped>
+  .v-card {
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  .line-chart {
+    height: 400px;
+  }
+</style>
+  
