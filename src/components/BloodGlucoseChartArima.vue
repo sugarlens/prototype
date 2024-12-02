@@ -117,7 +117,7 @@ export default {
       //   // console.log(this.futureARIMAPoints);
       // });
       const lastTime = readings[readings.length - 1].time;
-      const ARIMAPredictions = await this.buildPredictionModel(readings.map((reading) => reading.mmol).slice(-50));
+      const ARIMAPredictions = await this.buildPredictionModel(readings.map((reading) => reading.mmol).slice(-150));
       this.futureARIMAPoints = ARIMAPredictions.map((value, index) => ({
         x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
         y: getActualReading(value, minValue, maxValue)
@@ -184,7 +184,7 @@ export default {
       }
       return Math.sqrt(sumSquaredError / n); // Return RMSE
     },
-    buildPredictionModel(data, trainingIterations = 20) {
+    buildPredictionModel(data, trainingIterations = 40) {
       const ARIMAPromise = require('arima/async')
       return ARIMAPromise.then(ARIMA => {
         let bestModel = null;
