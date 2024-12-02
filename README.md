@@ -6,6 +6,8 @@ The tools shows both the raw data and the data after a Kalman filter is applied.
 
 The prediction is based on the regression model with highest R^2 among linear, polynomial degree 2, polynomial degree 3. The number of data points is selected by consideing the spread of the latest data (the higher the spread the less points considered). All this is computed on the data after the Kalman filter.
 
+A second prediction is produced using the Double Exponential Smoothing.
+
 ## Project setup
 ```
 npm install
