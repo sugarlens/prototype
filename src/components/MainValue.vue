@@ -60,6 +60,13 @@ export default {
             }
         }
     },
+    mounted() {
+        this.updateNow();
+        this.timer = setInterval(this.updateNow, 10*1000);
+    },
+    beforeUnmount() {
+        clearInterval(this.timer);
+    }
 }
 </script>
 
