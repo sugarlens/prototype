@@ -19,7 +19,7 @@ const pointsForRegressionMin = 6;
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, horizontalLinePlugin, futureBackgroundPlugin);
 
 export default {
-  name: 'BloodGlucoseChartArima',
+  name: 'BloodGlucoseChartSES',
   components: {
     Line
   },
@@ -73,7 +73,6 @@ export default {
           futureBackgroundPlugin: true
         },
       },
-      futureARIMAPoints: [],
     };
   },
   watch: {
@@ -105,24 +104,19 @@ export default {
       const pointsForRegression = calculatePointsForRegression(dataForPrediction.slice(-pointsForRegressionCheck), pointsForRegressionMin, pointsForRegressionMax);
       const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(dataForPrediction.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
 
-      // ARIMA prediction
-      // await this.buildPredictionModel(readings.map((reading) => reading.mmol).slice(-100)).then((predictions) => {
-      //   const lastTime = readings[readings.length - 1].time;
-      //   this.futureARIMAPoints = predictions.map((value, index) => ({
-      //     x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
-      //     y: getActualReading(value, minValue, maxValue).toFixed(2)
-      //   }));
-
-      //   this.$refs.chartRef.chart.update();
-      //   // console.log(this.futureARIMAPoints);
-      // });
+      // SES prediction
+      const zodiac = require("zodiac-ts");
+      var alpha = 0;
+      var ses = new zodiac.DoubleExponentialSmoothing(readings.map((reading) => reading.mmol), alpha);
+      ses.optimizeParameter(50);
+      var forecast = ses.predict(3).slice(-3);
       const lastTime = readings[readings.length - 1].time;
-      const ARIMAPredictions = await this.buildPredictionModel(readings.map((reading) => reading.mmol).slice(-150));
-      this.futureARIMAPoints = ARIMAPredictions.map((value, index) => ({
+      const futureSESPoints = forecast.map((value, index) => ({
         x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
-        y: getActualReading(value, minValue, maxValue)
+        y: getActualReading(value).toFixed(2)
       }));
 
+      
       // definition of labels as all times
       var times = [...newReadings.map((reading) => reading.time), ...futureRegressionPoints.map((point) => new Date(point.x))];
 
@@ -132,6 +126,7 @@ export default {
         datasets: [
           {
             // Raw glucose values
+            label: 'Raw glucose values',
             data: glucoseValues,
             pointRadius: 2,
             pointBackgroundColor: colorsActualReadings,
@@ -148,6 +143,7 @@ export default {
           },
           {
             // Regression line for past data
+            label: 'Regression',
             data: pastRegressionPoints,
             borderColor: 'rgba(255, 255, 255, 0.5)',
             borderWidth: 1,
@@ -156,6 +152,7 @@ export default {
           },
           {
             // Regression line for future data
+            labels: 'SES Forecast',
             data: futureRegressionPoints,
             borderColor: 'transparent',
             borderWidth: 0,
@@ -164,8 +161,7 @@ export default {
           },
           {
             // Regression line for future data
-            label: 'ARIMA',
-            data: this.futureARIMAPoints,
+            data: futureSESPoints,
             borderColor: 'transparent',
             borderWidth: 0,
             pointRadius: 3,
