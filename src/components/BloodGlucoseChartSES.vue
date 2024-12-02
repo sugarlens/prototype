@@ -180,47 +180,6 @@ export default {
       }
       return Math.sqrt(sumSquaredError / n); // Return RMSE
     },
-    buildPredictionModel(data, trainingIterations = 40) {
-      const ARIMAPromise = require('arima/async')
-      return ARIMAPromise.then(ARIMA => {
-        let bestModel = null;
-        let bestError = Infinity;
-        let bestParams = null;
-
-        for (let e = 0; e < trainingIterations; e++) {
-          // Initialize and train the ARIMA model with current parameters
-          const params = {
-            p: Math.round(11 * Math.random()),
-            d: Math.round(2 * Math.random()),
-            q: Math.round(5 * Math.random()),
-            method: 0,
-            verbose: false,
-          };
-          const arima = new ARIMA(params);
-          arima.train(data.slice(0, -3)); // Train the model with all data except the last 10 points
-          const predictions = arima.predict(3);
-          const actual = data.slice(-3);
-          const error = this.evaluateModel(actual, predictions[0]);
-          console.log(`Tested p=\t${params.p}\td=\t${params.d}\tq=\t${params.q}\tRMSE=\t${error}`);
-          if (error < bestError) {
-            bestError = error;
-            bestParams = params;
-            bestModel = arima;
-          }
-        }
-
-        if (bestModel) {
-          console.log("Best ARIMA model found!", bestParams);
-          const arima = new ARIMA(bestParams);
-          arima.train(data);
-          // eslint-disable-next-line
-          const [ predictions, errors ] = arima.predict(3);
-          console.log("Predictions: ", predictions);
-          return predictions;
-        }
-        return [];
-      })
-    }
   },
   mounted() {
     // Initialize chartData when the component is mounted
