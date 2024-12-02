@@ -52,12 +52,13 @@ export default {
             return moment(this.latestEntry.time).isBefore(fifteenMinutesAgo);
         }
     },
-    mounted() {
-        this.updateNow();
-        this.timer = setInterval(this.updateNow, 10*1000);
-    },
-    beforeUnmount() {
-        clearInterval(this.timer);
+    watch: {
+        history: {
+            immediate: true,
+            handler() {
+                this.updateNow();
+            }
+        }
     },
 }
 </script>
