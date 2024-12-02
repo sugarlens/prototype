@@ -8,6 +8,15 @@ module.exports = defineConfig({
     vuetify: { }
   },
 
+  configureWebpack: {
+    resolve: {
+      fallback: {
+        path: false,
+        fs: false,
+      }
+    }
+  },
+
   chainWebpack(config) {
     config.plugin('html').tap(args => {
       args[0].title = 'Sugarlens - Prototype';
