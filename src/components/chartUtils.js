@@ -68,9 +68,11 @@ export function extendRegression(regressionResult, lastNormalizedTime, maxTime, 
 export function getBestRegression(data) {
 	var models = [];
 	models.push(regression.linear(data));
-	models.push(regression.polynomial(data, { order: 2 }));
-	models.push(regression.polynomial(data, { order: 3 }));
-	// models.push(regression.exponential(data));
+	models.push(regression.polynomial(data, { order: 2, precision: 3 }));
+	models.push(regression.polynomial(data, { order: 3, precision: 3 }));
+	models.push(regression.polynomial(data, { order: 4, precision: 3 }));
+	models.push(regression.power(data));
+	models.push(regression.exponential(data));
 
 	// select model with the highest R^2 value
 	var bestModel = models.reduce((best, model) => {
