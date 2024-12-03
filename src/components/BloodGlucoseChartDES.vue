@@ -6,14 +6,14 @@
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
-import { smoothData, getColorForReading, getActualReading, doRegression, horizontalLinePlugin, futureBackgroundPlugin, calculatePointsForRegression } from './chartUtils';
+import { smoothData, getColorForReading, getActualReading, horizontalLinePlugin, futureBackgroundPlugin, } from './chartUtils';
 
 const minValue = 2;
 const maxValue = 17;
 const optimalMin = 4;
 const optimalMax = 10;
-const pointsForRegressionMax = 18;
-const pointsForRegressionMin = 6;
+// const pointsForRegressionMax = 18;
+// const pointsForRegressionMin = 6;
 
 // Register the necessary Chart.js components
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, horizontalLinePlugin, futureBackgroundPlugin);
@@ -95,9 +95,9 @@ export default {
 			}
 			this.chartOptions.horizontalLines.push({
 				y: averageGlucose,
-				color: "gray",
+				color: "white",
 				lineWidth: 1,
-				dash: [5, 5],
+				dash: [5, 2],
 			});
 
 			// Consider only the last amountOfDataPoints readings
@@ -105,23 +105,15 @@ export default {
 			var smoothedReadings = smoothData(readings.map((reading) => reading.mmol)).slice(-this.amountOfDataPoints);
 
 			// Extract times and glucose values from the readings prop
-			const glucoseValues = newReadings.map((reading) => getActualReading(reading.mmol, minValue, maxValue));
+			const glucoseValues = newReadings.map((reading) => ({
+				x: reading.time,
+				y: getActualReading(reading.mmol, minValue, maxValue)
+			}));
 			const colorsActualReadings = newReadings.map((reading) => getColorForReading(reading.mmol, minValue, maxValue, optimalMin, optimalMax, 0.3));
 			const colorsSmoothedReadings = smoothedReadings.map((reading) => getColorForReading(reading, minValue, maxValue, optimalMin, optimalMax, 0.9));
 			const lastTime = readings[readings.length - 1].time;
 
-			// Regression prediction
-			// compute how many points to use for the regression based on the spread of the data
-			const pointsForRegressionCheck = pointsForRegressionMin + Math.round((pointsForRegressionMax - pointsForRegressionMin) / 2);
-			const dataForPrediction = smoothedReadings.map((value, index) => ({ time: newReadings[index].time, mmol: parseFloat(value) }));
-			const pointsForRegression = calculatePointsForRegression(dataForPrediction.slice(-pointsForRegressionCheck), pointsForRegressionMin, pointsForRegressionMax);
-			const [pastRegressionPoints, futureRegressionPoints] = doRegression(dataForPrediction.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
-			const futureRegressionPointsWithTime = futureRegressionPoints.map((point, index) => ({
-				x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
-				y: point
-			}));
-
-			// SES prediction
+			// DES prediction
 			const zodiac = require("zodiac-ts");
 			var alpha = 0;
 			var ses = new zodiac.DoubleExponentialSmoothing(readings.map((reading) => reading.mmol), alpha);
@@ -133,7 +125,7 @@ export default {
 			}));
 
 			// definition of labels as all times
-			var times = [...newReadings.map((reading) => reading.time), ...futureRegressionPointsWithTime.map((point) => new Date(point.x))];
+			var times = [...newReadings.map((reading) => reading.time), ...futureDESPoints.map((point) => new Date(point.x))];
 
 			// Set chartData with proper structure
 			this.chartData = {
@@ -141,7 +133,7 @@ export default {
 				datasets: [
 					{
 						// Raw glucose values
-						label: 'Raw glucose values',
+						label: 'Raw glucose value',
 						data: glucoseValues,
 						pointRadius: 2,
 						pointBackgroundColor: colorsActualReadings,
@@ -149,7 +141,7 @@ export default {
 					},
 					{
 						// Smoothed glucose values
-						label: 'Past', // name is fixed so that the future background area is properly colored
+						label: 'Glucose value', // name is fixed so that the future background area is properly colored
 						data: smoothedReadings,
 						pointRadius: 3,
 						borderWidth: 1,
@@ -157,24 +149,7 @@ export default {
 						borderColor: 'transparent',
 					},
 					{
-						// Regression line for past data
-						data: pastRegressionPoints,
-						borderColor: 'rgba(255, 255, 255, 0.5)',
-						borderWidth: 1,
-						pointRadius: 0,
-						borderDash: [5, 2],
-					},
-					{
-						// Regression line for future data
-						label: 'Regression prediction',
-						data: futureRegressionPointsWithTime,
-						borderColor: 'transparent',
-						borderWidth: 0,
-						pointRadius: 3,
-						pointBackgroundColor: 'rgba(255, 255, 255, 0.5)',
-					},
-					{
-						// Regression line for future data
+						// Prediction points
 						label: 'DES Forecast',
 						data: futureDESPoints,
 						borderColor: 'transparent',
@@ -184,16 +159,6 @@ export default {
 					},
 				]
 			};
-		},
-		evaluateModel(actual, predicted) {
-			const n = actual.length;
-			let sumSquaredError = 0;
-
-			for (let i = 0; i < n; i++) {
-				sumSquaredError += Math.pow(actual[i] - predicted[i], 2);
-				// console.log(`Actual: ${actual[i]}, Predicted: ${predicted[i]}`);
-			}
-			return Math.sqrt(sumSquaredError / n); // Return RMSE
 		},
 		calculateAverage(readings) {
 			if (!readings || readings.length === 0) return 0;

@@ -171,7 +171,7 @@ export const futureBackgroundPlugin = {
 		const { ctx, chartArea, scales } = chart;
 		const { top, bottom } = chartArea;
 		const xScale = scales.x;
-		const pastDataset = chart.data.datasets.find(dataset => dataset.label === 'Past');
+		const pastDataset = chart.data.datasets.find(dataset => dataset.label === 'Raw glucose value');
 		const lastPastIndex = pastDataset?.data[pastDataset.data.length - 1]?.x;
 		const firstFutureX = xScale.getPixelForValue(lastPastIndex) + 5;
 		if (firstFutureX) {
