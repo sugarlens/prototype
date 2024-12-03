@@ -5,14 +5,14 @@
 <script>
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
-import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
+import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, Filler } from 'chart.js';
 import { horizontalFillPlugin } from './chartUtils.js';
 
 const optimalMin = 4;
 const optimalMax = 10;
 
 // Register the necessary Chart.js components
-ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement);
+ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, Filler);
 
 export default {
 	name: 'DailyBloodGlucoseChart',
@@ -66,6 +66,8 @@ export default {
 					filler: true,
 					horizontalFill: {
 						color: "rgba(255, 255, 255, 0.15)",
+						borderColor: 'transparent',
+						borderWidth: 0,
 						startValue: optimalMin,
 						endValue: optimalMax,
 					},
@@ -92,6 +94,10 @@ export default {
 			const times = newReadings.map((reading) => reading.time);
 			const glucoseValues = newReadings.map((reading) => reading.mmol);
 
+			// Calculate the areas to fill
+			const aboveOptimalMax = glucoseValues.map((value) => (value > optimalMax ? value : null));
+			const belowOptimalMin = glucoseValues.map((value) => (value < optimalMin ? value : null));
+
 			// Set chartData with proper structure
 			this.chartData = {
 				labels: times,
@@ -102,7 +108,24 @@ export default {
 						borderColor: "#CCCCCC",
 						borderWidth: 2,
 						tension: 0.5,
-					}
+						fill: false,
+					},
+					{
+						data: aboveOptimalMax,
+						backgroundColor: "rgba(254, 214, 92, 0.5)", // Red for above optimalMax
+						borderColor: "transparent",
+						borderWidth: 0,
+						pointRadius: 0,
+						fill: { value: optimalMax },
+					},
+					{
+						data: belowOptimalMin,
+						backgroundColor: "rgba(253, 140, 128, 0.5)",
+						borderColor: "transparent",
+						borderWidth: 0,
+						pointRadius: 0,
+						fill: { value: optimalMin },
+					},
 				]
 			};
 		}

@@ -69,8 +69,7 @@
 							<v-col cols="12">
 								<v-card>
 									<v-card-text>
-										<BloodGlucoseChartDES :readings="history" :amount-of-data-points="30"
-											style="height: 200px"></BloodGlucoseChartDES>
+										<BloodGlucoseChartDES :readings="history" :amount-of-data-points="30" style="height: 200px"></BloodGlucoseChartDES>
 									</v-card-text>
 								</v-card>
 							</v-col>
@@ -95,8 +94,7 @@
 							<v-col cols="12">
 								<v-card>
 									<v-card-text>
-										<DailyBloodGlucoseChart :readings="history" :amount-of-data-points="12 * 24"
-											style="height: 100px"></DailyBloodGlucoseChart>
+										<DailyBloodGlucoseChart :readings="history" :amount-of-data-points="12 * 24" style="height: 100px"></DailyBloodGlucoseChart>
 									</v-card-text>
 								</v-card>
 							</v-col>

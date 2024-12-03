@@ -88,6 +88,18 @@ export default {
 				return;
 			}
 
+			// Add the average glucose as a horizontal line
+			const averageGlucose = this.calculateAverage(readings);
+			if (this.chartOptions.horizontalLines.length > 2) {
+				this.chartOptions.horizontalLines.pop();
+			}
+			this.chartOptions.horizontalLines.push({
+				y: averageGlucose,
+				color: "gray",
+				lineWidth: 1,
+				dash: [5, 5],
+			});
+
 			// Consider only the last amountOfDataPoints readings
 			var newReadings = readings.slice(-this.amountOfDataPoints);
 			var smoothedReadings = smoothData(readings.map((reading) => reading.mmol)).slice(-this.amountOfDataPoints);
@@ -119,7 +131,6 @@ export default {
 				x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
 				y: getActualReading(value).toFixed(2)
 			}));
-
 
 			// definition of labels as all times
 			var times = [...newReadings.map((reading) => reading.time), ...futureRegressionPointsWithTime.map((point) => new Date(point.x))];
@@ -184,6 +195,12 @@ export default {
 			}
 			return Math.sqrt(sumSquaredError / n); // Return RMSE
 		},
+		calculateAverage(readings) {
+			if (!readings || readings.length === 0) return 0;
+			const total = readings.reduce((sum, reading) => sum + reading.mmol, 0);
+			return total / readings.length;
+		},
+
 	},
 	mounted() {
 		// Initialize chartData when the component is mounted
