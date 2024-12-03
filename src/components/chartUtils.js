@@ -58,14 +58,8 @@ export function extendRegression(regressionResult, lastNormalizedTime, maxTime, 
         const futureNormalizedTime = lastNormalizedTime + (i * futureInterval);  // Increment in normalized units
         const futureY = predictValue(regressionResult, futureNormalizedTime);
 
-        // Convert the future normalized time back to real time (milliseconds)
-        const futureRealTime = minTime + futureNormalizedTime * (maxTime - minTime);
-
         // Push the future point
-        futurePoints.push({
-            x: new Date(futureRealTime),
-            y: futureY,
-        });
+        futurePoints.push(futureY);
     }
 
     return futurePoints;

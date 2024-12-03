@@ -96,6 +96,7 @@ export default {
       const glucoseValues = newReadings.map((reading) => getActualReading(reading.mmol, minValue, maxValue));
       const colorsActualReadings = newReadings.map((reading) => getColorForReading(reading.mmol, minValue, maxValue, optimalMin, optimalMax, 0.3));
       const colorsSmoothedReadings = smoothedReadings.map((reading) => getColorForReading(reading, minValue, maxValue, optimalMin, optimalMax, 0.9));
+      const lastTime = readings[readings.length - 1].time;
 
       // Regression prediction
       // compute how many points to use for the regression based on the spread of the data
@@ -103,6 +104,10 @@ export default {
       const dataForPrediction = smoothedReadings.map((value, index) => ({ time: newReadings[index].time, mmol: parseFloat(value) }));
       const pointsForRegression = calculatePointsForRegression(dataForPrediction.slice(-pointsForRegressionCheck), pointsForRegressionMin, pointsForRegressionMax);
       const [ pastRegressionPoints, futureRegressionPoints ] = doRegression(dataForPrediction.slice(-pointsForRegression), minValue, maxValue, pointsForRegression);
+      const futureRegressionPointsWithTime = futureRegressionPoints.map((point, index) => ({
+        x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
+        y: point
+      }));
 
       // SES prediction
       const zodiac = require("zodiac-ts");
@@ -110,15 +115,14 @@ export default {
       var ses = new zodiac.DoubleExponentialSmoothing(readings.map((reading) => reading.mmol), alpha);
       ses.optimizeParameter(50);
       var forecast = ses.predict(3).slice(-3);
-      const lastTime = readings[readings.length - 1].time;
-      const futureSESPoints = forecast.map((value, index) => ({
+      const futureDESPoints = forecast.map((value, index) => ({
         x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
         y: getActualReading(value).toFixed(2)
       }));
 
       
       // definition of labels as all times
-      var times = [...newReadings.map((reading) => reading.time), ...futureRegressionPoints.map((point) => new Date(point.x))];
+      var times = [...newReadings.map((reading) => reading.time), ...futureRegressionPointsWithTime.map((point) => new Date(point.x))];
 
       // Set chartData with proper structure
       this.chartData = {
@@ -143,7 +147,6 @@ export default {
           },
           {
             // Regression line for past data
-            label: 'Regression',
             data: pastRegressionPoints,
             borderColor: 'rgba(255, 255, 255, 0.5)',
             borderWidth: 1,
@@ -152,8 +155,8 @@ export default {
           },
           {
             // Regression line for future data
-            labels: 'SES Forecast',
-            data: futureRegressionPoints,
+            label: 'Regression prediction',
+            data: futureRegressionPointsWithTime,
             borderColor: 'transparent',
             borderWidth: 0,
             pointRadius: 3,
@@ -161,11 +164,12 @@ export default {
           },
           {
             // Regression line for future data
-            data: futureSESPoints,
+            label: 'DES Forecast',
+            data: futureDESPoints,
             borderColor: 'transparent',
             borderWidth: 0,
             pointRadius: 3,
-            pointBackgroundColor: 'rgba(255, 255, 0, 0.75)',
+            pointBackgroundColor: 'rgba(49, 151, 190, 1)',
           },
         ]
       };
