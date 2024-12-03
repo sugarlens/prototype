@@ -19,7 +19,7 @@ const pointsForRegressionMin = 6;
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, horizontalLinePlugin, futureBackgroundPlugin);
 
 export default {
-  name: 'BloodGlucoseChartSES',
+  name: 'BloodGlucoseChartDES',
   components: {
     Line
   },

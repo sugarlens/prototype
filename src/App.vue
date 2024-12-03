@@ -37,7 +37,7 @@
             <v-col cols="9" class="d-flex align-stretch">
               <v-card class="w-100 d-flex">
                 <v-card-text class="flex-grow-1">
-                  <BloodGlucoseChartSES :readings="history"></BloodGlucoseChartSES>
+                  <BloodGlucoseChartDES :readings="history"></BloodGlucoseChartDES>
                 </v-card-text>
               </v-card>
             </v-col>
@@ -67,7 +67,7 @@
               <v-col cols="12" >
                 <v-card>
                   <v-card-text>
-                    <BloodGlucoseChartSES :readings="history" :amount-of-data-points="30" style="height: 200px"></BloodGlucoseChartSES>
+                    <BloodGlucoseChartDES :readings="history" :amount-of-data-points="30" style="height: 200px"></BloodGlucoseChartDES>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -131,7 +131,7 @@ import InRangeDay from './components/InRangeDay.vue';
 import AverageDay from './components/AverageDay.vue';
 import DailyBloodGlucoseChart from './components/DailyBloodGlucoseChart.vue';
 import moment from 'moment';  
-import BloodGlucoseChartSES from './components/BloodGlucoseChartSES.vue';
+import BloodGlucoseChartDES from './components/BloodGlucoseChartDES.vue';
 
 // const Client = require('./dexcom-mock.js');
 const Client = require('./dexcom.js');
@@ -139,7 +139,7 @@ const Client = require('./dexcom.js');
 export default {
   components: {
     MainValue,
-    BloodGlucoseChartSES,
+    BloodGlucoseChartDES,
   },
   data() {
     return {
