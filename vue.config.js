@@ -1,17 +1,17 @@
 const { defineConfig } = require('@vue/cli-service')
 
 module.exports = defineConfig({
-  transpileDependencies: true,
-  publicPath: "/prototype/",
-  
-  pluginOptions: {
-    vuetify: { }
-  },
+	transpileDependencies: true,
+	publicPath: "/prototype/",
 
-  chainWebpack(config) {
-    config.plugin('html').tap(args => {
-      args[0].title = 'Sugarlens - Prototype';
-      return args;
-    });
-  },
+	pluginOptions: {
+		vuetify: {}
+	},
+
+	chainWebpack(config) {
+		config.plugin('html').tap(args => {
+			args[0].title = 'Sugarlens - Prototype';
+			return args;
+		});
+	},
 })
