@@ -62,6 +62,7 @@ export default {
 					}
 				},
 				maintainAspectRatio: false,
+				horizontalLines: [],
 				plugins: {
 					filler: true,
 					horizontalFill: {
@@ -89,6 +90,18 @@ export default {
 			}
 
 			var newReadings = readings.slice(-this.amountOfDataPoints);
+
+			// Add the average glucose as a horizontal line
+			const averageGlucose = this.calculateAverage(newReadings);
+			if (this.chartOptions.horizontalLines.length > 0) {
+				this.chartOptions.horizontalLines.pop();
+			}
+			this.chartOptions.horizontalLines.push({
+				y: averageGlucose,
+				color: "rgba(255, 255, 255, 0.3)",
+				lineWidth: 2,
+				dash: [5, 2],
+			});
 
 			// Extract times and glucose values from the readings prop
 			const times = newReadings.map((reading) => reading.time);
@@ -128,7 +141,12 @@ export default {
 					},
 				]
 			};
-		}
+		},
+		calculateAverage(readings) {
+			if (!readings || readings.length === 0) return 0;
+			const total = readings.reduce((sum, reading) => sum + reading.mmol, 0);
+			return total / readings.length;
+		},
 	},
 	mounted() {
 		// Initialize chartData when the component is mounted
