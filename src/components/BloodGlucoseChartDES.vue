@@ -95,9 +95,9 @@ export default {
 			}
 			this.chartOptions.horizontalLines.push({
 				y: averageGlucose,
-				color: "rgba(255, 255, 255, 0.3)",
-				lineWidth: 2,
-				dash: [5, 2],
+				color: "rgba(255, 255, 255, 0.2)",
+				lineWidth: 3,
+				dash: [7, 3],
 			});
 
 			// Consider only the last amountOfDataPoints readings
@@ -117,7 +117,7 @@ export default {
 			const zodiac = require("zodiac-ts");
 			var alpha = 0;
 			var ses = new zodiac.DoubleExponentialSmoothing(readings.map((reading) => reading.mmol), alpha);
-			ses.optimizeParameter(50);
+			ses.optimizeParameter(20);
 			var forecast = ses.predict(3).slice(-3);
 			const futureDESPoints = forecast.map((value, index) => ({
 				x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),

@@ -98,7 +98,7 @@ export default {
 			}
 			this.chartOptions.horizontalLines.push({
 				y: averageGlucose,
-				color: "rgba(255, 255, 255, 0.3)",
+				color: "rgba(255, 255, 255, 0.2)",
 				lineWidth: 2,
 				dash: [5, 2],
 			});
