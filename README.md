@@ -1,12 +1,14 @@
 # Sugarlens prototype
 
-## How the data is processed
+## How personal data is handled
 
-The tools shows both the raw data and the data after a Kalman filter is applied. What is highlighed is the data AFTER the application of the filter.
+No personal data is stored on the app and there is no backend. The login credendials are stored on the [Local Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API) of the browser on the user's machine.
 
-The prediction is based on the regression model with highest R^2 among linear, polynomial degree 2, polynomial degree 3. The number of data points is selected by consideing the spread of the latest data (the higher the spread the less points considered). All this is computed on the data after the Kalman filter.
+## How the data is displayed and processed
 
-A second prediction is produced using the Double Exponential Smoothing.
+The tools shows both the raw data and the data after a [Kalman filter](https://en.wikipedia.org/wiki/Kalman_filter) (R=0.1, Q=0.1) is applied. What is highlighed is the data AFTER the application of the filter.
+
+The prediction is based on [Double Exponential Smoothing](https://en.wikipedia.org/wiki/Exponential_smoothing) learned over the raw data of the last day. Parameters are optimized looking at 20 possible values evenly distributed. 
 
 ## Project setup
 ```
