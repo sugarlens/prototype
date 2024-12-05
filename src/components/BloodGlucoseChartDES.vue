@@ -6,14 +6,12 @@
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
-import { smoothData, getColorForReading, getActualReading, horizontalLinePlugin, futureBackgroundPlugin, } from './chartUtils';
+import { smoothData, getColorForReading, getActualReading, horizontalLinePlugin, futureBackgroundPlugin, calculateAverage } from './chartUtils';
 
 const minValue = 2;
 const maxValue = 17;
 const optimalMin = 4;
 const optimalMax = 10;
-// const pointsForRegressionMax = 18;
-// const pointsForRegressionMin = 6;
 
 // Register the necessary Chart.js components
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, horizontalLinePlugin, futureBackgroundPlugin);
@@ -89,7 +87,7 @@ export default {
 			}
 
 			// Add the average glucose as a horizontal line
-			const averageGlucose = this.calculateAverage(readings);
+			const averageGlucose = calculateAverage(readings);
 			if (this.chartOptions.horizontalLines.length > 2) {
 				this.chartOptions.horizontalLines.pop();
 			}
@@ -160,12 +158,6 @@ export default {
 				]
 			};
 		},
-		calculateAverage(readings) {
-			if (!readings || readings.length === 0) return 0;
-			const total = readings.reduce((sum, reading) => sum + reading.mmol, 0);
-			return total / readings.length;
-		},
-
 	},
 	mounted() {
 		// Initialize chartData when the component is mounted

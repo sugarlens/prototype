@@ -123,6 +123,11 @@ export function calculatePointsForRegression(data, minPointsForRegression, maxPo
 
 }
 
+export function calculateAverage(readings) {
+	if (!readings || readings.length === 0) return 0;
+	const total = readings.reduce((sum, reading) => sum + reading.mmol, 0);
+	return total / readings.length;
+}
 
 
 // Plugin to fill horizontal area
