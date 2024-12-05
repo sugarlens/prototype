@@ -3,8 +3,8 @@
 	"short_name": "Sugarlens",
 	"start_url": "/prototype/",
 	"display": "standalone",
-	"background_color": "#ffffff",
-	"theme_color": "#4DBA87",
+	"background_color": "#000000",
+	"theme_color": "#212121",
 	"icons": [
 	  {
 		"src": "/prototype/img/icons/android/android-launchericon-192-192.png",
