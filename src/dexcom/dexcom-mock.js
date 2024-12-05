@@ -36,11 +36,11 @@ const Client = (function () {
 				{ "time": new Date("2024-11-28 16:10"), "mmol": 16, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" } },
 				{ "time": new Date("2024-11-28 16:15"), "mmol": 15, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" } },
 				{ "time": new Date("2024-11-28 16:20"), "mmol": 14, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" } },
-				{ "time": new Date("2024-11-28 16:25"), "mmol":12, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-				{ "time": new Date("2024-11-28 16:30"), "mmol":10, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-				{ "time": new Date("2024-11-28 16:35"), "mmol":8, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-				{ "time": new Date("2024-11-28 16:40"), "mmol":6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
-				{ "time": new Date("2024-11-28 16:45"), "mmol":4, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+				{ "time": new Date("2024-11-28 16:25"), "mmol": 12, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+				{ "time": new Date("2024-11-28 16:30"), "mmol": 10, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+				{ "time": new Date("2024-11-28 16:35"), "mmol": 8, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+				{ "time": new Date("2024-11-28 16:40"), "mmol": 6, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
+				{ "time": new Date("2024-11-28 16:45"), "mmol": 4, "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }},
 			].reverse();
 		}
 	}
