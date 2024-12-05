@@ -9,7 +9,7 @@ import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, Linea
 import { smoothData, getColorForReading, getActualReading, horizontalLinePlugin, futureBackgroundPlugin, calculateAverage } from './chartUtils';
 
 const minValue = 2;
-const maxValue = 17;
+const maxValue = 20;
 const optimalMin = 4;
 const optimalMax = 10;
 
@@ -119,7 +119,7 @@ export default {
 			var forecast = ses.predict(3).slice(-3);
 			const futureDESPoints = forecast.map((value, index) => ({
 				x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
-				y: getActualReading(value).toFixed(2)
+				y: getActualReading(value, minValue, maxValue).toFixed(2)
 			}));
 
 			// definition of labels as all times
