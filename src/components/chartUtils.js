@@ -178,10 +178,11 @@ export const futureBackgroundPlugin = {
 		const xScale = scales.x;
 		const pastDataset = chart.data.datasets.find(dataset => dataset.label === 'Raw glucose value');
 		const lastPastIndex = pastDataset?.data[pastDataset.data.length - 1]?.x;
-		const firstFutureX = xScale.getPixelForValue(lastPastIndex) + 5;
+		const pointsDifference = xScale.getPixelForValue(pastDataset?.data[pastDataset.data.length - 1]?.x) - xScale.getPixelForValue(pastDataset?.data[pastDataset.data.length - 2]?.x);
+		const firstFutureX = xScale.getPixelForValue(lastPastIndex) + (pointsDifference/2);
 		if (firstFutureX) {
 			ctx.save();
-			ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+			ctx.fillStyle = 'rgba(255, 255, 255, 0.075)';
 			ctx.fillRect(firstFutureX, top, chartArea.right - firstFutureX, bottom - top);
 			ctx.restore();
 		}
