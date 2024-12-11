@@ -1,8 +1,8 @@
 <template>
 	<div class="text-center">
 		<p class="muted vertical float-left">Avg - 24h</p>
-		<p class="large">{{ average.toFixed(1) }}</p>
-		<p class="muted">mmol/l</p>
+		<p class="large">{{ (average*18*0.02345 + 3.38).toFixed(1) }}%</p>
+		<p class="muted">HbA<sub>1c</sub></p>
 	</div>
 </template>
 
@@ -60,6 +60,6 @@ export default {
 }
 
 .large {
-	font-size: 2.5em;
+	font-size: 2em;
 }
 </style>
