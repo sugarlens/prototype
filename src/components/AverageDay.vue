@@ -1,8 +1,8 @@
 <template>
 	<div class="text-center">
 		<p class="muted vertical float-left">Avg - 24h</p>
-		<p class="large">{{ average.toFixed(1) }}</p>
-		<p class="muted">mmol/l</p>
+		<p class="large">{{ average.toFixed(1) }}<span class="muted"> mmol/l</span></p>
+		<p class="hba1c">{{ (average*18*0.02345 + 3.38).toFixed(1) }}% <span class="muted">HbA<sub>1c</sub></span></p>
 	</div>
 </template>
 
@@ -49,16 +49,24 @@ export default {
 <style scoped>
 .muted {
 	opacity: 0.5;
-	font-size: .9em;
+	font-size: .4em;
 }
 
 .vertical {
+	font-size: .9em;
 	writing-mode: vertical-rl;
 	text-orientation: mixed;
 	transform: rotate(180deg);
 }
 
 .large {
-	font-size: 2.5em;
+	font-size: 2em;
+}
+
+.hba1c {
+	font-size: 1em;
+}
+.hba1c .muted {
+	font-size: .7em;
 }
 </style>
