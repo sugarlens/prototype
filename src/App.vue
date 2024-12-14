@@ -99,15 +99,6 @@
 								</v-card>
 							</v-col>
 						</v-row>
-						<v-row>
-							<v-col cols="6">
-								<v-card>
-									<v-card-text>
-										<AverageDayHba1c :history="history"></AverageDayHba1c>
-									</v-card-text>
-								</v-card>
-							</v-col>
-						</v-row>
 					</div>
 				</div>
 			</v-container>
@@ -140,7 +131,6 @@ onUnmounted(() => {
 import MainValue from './components/MainValue.vue';
 import InRangeDay from './components/InRangeDay.vue';
 import AverageDay from './components/AverageDay.vue';
-import AverageDayHba1c from './components/AverageDayHba1c.vue';
 import DailyBloodGlucoseChart from './components/DailyBloodGlucoseChart.vue';
 import BloodGlucoseChartDES from './components/BloodGlucoseChartDES.vue';
 import moment from 'moment';
