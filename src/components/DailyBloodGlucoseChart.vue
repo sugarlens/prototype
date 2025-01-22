@@ -27,6 +27,10 @@ export default {
 		amountOfDataPoints: {
 			type: Number,
 			default: 12 * 3
+		},
+		fillDay: {
+			type: Boolean,
+			default: false
 		}
 	},
 	setup() {
@@ -105,6 +109,14 @@ export default {
 
 			// Extract times and glucose values from the readings prop
 			const times = newReadings.map((reading) => reading.time);
+			if (this.fillDay) {
+				const lastTime = new Date(times[times.length - 1]);
+				for (let i = 0; i < 24 - lastTime.getHours(); i++) {
+					const newTime = new Date(lastTime);
+					newTime.setHours(lastTime.getHours() + i);
+					times.push(newTime.toISOString());
+				}
+			}
 			const glucoseValues = newReadings.map((reading) => reading.mmol);
 
 			// Calculate the areas to fill
