@@ -1,6 +1,6 @@
 <template>
 	<div class="text-center">
-		<p class="muted vertical float-left">Avg - 24h</p>
+		<p class="muted vertical float-left mt-3">Average</p>
 		<p class="large">{{ average.toFixed(1) }}</p>
 		<p class="muted">mmol/l</p>
 	</div>

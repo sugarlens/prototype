@@ -3,7 +3,7 @@
 		<v-card-text>
 			<div class="float-right text-end class-muted">
 				<p>{{ now }}</p>
-				<p v-if="latestEntry && secondLatestEntry">Delta: {{ delta }} mmol/l</p>
+				<p v-if="latestEntry && secondLatestEntry">&Delta;: {{ delta }} mmol/l</p>
 			</div>
 			<p :class="{ 'large-text': true, 'stale': isReadingStale }">{{ latestEntry.mmol.toFixed(1) }} {{
 				latestEntry.trend.arrow }}</p>

@@ -1,6 +1,6 @@
 <template>
 	<div class="text-center">
-		<p class="muted mb-4 float-left">Range - 24h</p>
+		<p v-if="showTitle" class="muted mb-4 mt-4 float-left">Range</p>
 		<v-progress-circular :model-value="inRange" :size="70" :width="7">
 			<template v-slot:default><span class="value">{{ inRange }}%</span></template>
 		</v-progress-circular>
@@ -18,6 +18,10 @@ export default {
 				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" },
 				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" }
 			]
+		},
+		showTitle: {
+			type: Boolean,
+			default: true
 		}
 	},
 	data() {
