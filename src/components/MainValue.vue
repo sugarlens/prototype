@@ -5,8 +5,10 @@
 				<p>{{ now }}</p>
 				<p v-if="latestEntry && secondLatestEntry">&Delta;: {{ delta }} mmol/l</p>
 			</div>
-			<p :class="{ 'large-text': true, 'stale': isReadingStale }">{{ latestEntry.mmol.toFixed(1) }} {{
-				latestEntry.trend.arrow }}</p>
+			<p :class="{ 'large-text': true, 'stale': isReadingStale }">
+				{{ latestEntry.mmol.toFixed(1) }}
+				<span v-html="adjustArrows(latestEntry.trend.arrow)"></span>
+			</p>
 		</v-card-text>
 	</v-card>
 </template>
@@ -34,6 +36,16 @@ export default {
 		updateNow() {
 			this.now = moment(this.history[this.history.length - 1].time).fromNow();
 		},
+		adjustArrows(arrow) {
+			if (arrow === '↑') return '&uarr;';
+			if (arrow === '↓') return '&darr;';
+			if (arrow === '↗') return '&#8599;';
+			if (arrow === '↘') return '&#8600;';
+			if (arrow === '→') return '&rarr;';
+			if (arrow === '⮅') return '&#8648;';
+			if (arrow === '⮇') return '&#8650;';
+			return '?';
+		}
 	},
 	computed: {
 		latestEntry() {
