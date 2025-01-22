@@ -43,22 +43,18 @@
 			<p>Today</p>
 		</v-col>
 	</v-row>
-	<v-row>
-		<v-col cols="8">
-			<v-card>
-				<v-card-text>
+	<v-card>
+		<v-card-text>
+			<v-row>
+				<v-col cols="8">
 					<DailyBloodGlucoseChart :readings="history" :amount-of-data-points="readingsToday" :fillDay="true" style="height: 70px"></DailyBloodGlucoseChart>
-				</v-card-text>
-			</v-card>
-		</v-col>
-		<v-col cols="4">
-			<v-card>
-				<v-card-text>
+				</v-col>
+				<v-col cols="4">
 					<InRangeDay :showTitle="false" :history="history.slice(-readingsToday)"></InRangeDay>
-				</v-card-text>
-			</v-card>
-		</v-col>
-	</v-row>
+				</v-col>
+			</v-row>
+		</v-card-text>
+	</v-card>
 </template>
 
 <script>
