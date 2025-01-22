@@ -1,9 +1,10 @@
 <template>
 	<div class="text-center">
 		<p v-if="showTitle" class="muted mb-4 mt-4 float-left">Range</p>
-		<v-progress-circular :model-value="inRange" :size="size" :width="size / 10">
+		<v-progress-circular v-if="size > 0" :model-value="inRange" :size="size" :width="size / 10">
 			<template v-slot:default><span class="value">{{ inRange }}%</span></template>
 		</v-progress-circular>
+		<p v-else class="value">{{ inRange }}%</p>
 	</div>
 </template>
 

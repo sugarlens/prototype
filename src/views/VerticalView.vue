@@ -48,7 +48,7 @@
 			<DailyBloodGlucoseChart :readings="history" :amount-of-data-points="readingsToday" :fillDay="true" style="height: 100px"></DailyBloodGlucoseChart>
 		</v-col>
 		<v-col cols="2">
-			<InRangeDay :showTitle="false" :history="history.slice(-readingsToday)" :size="60" class="mt-3"></InRangeDay>
+			<InRangeDay :showTitle="false" :history="history.slice(-readingsToday)" :size="0" class="mt-6"></InRangeDay>
 		</v-col>
 	</v-row>
 </template>
