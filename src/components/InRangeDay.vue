@@ -1,7 +1,7 @@
 <template>
 	<div class="text-center">
 		<p v-if="showTitle" class="muted mb-4 mt-4 float-left">Range</p>
-		<v-progress-circular :model-value="inRange" :size="70" :width="7">
+		<v-progress-circular :model-value="inRange" :size="size" :width="size / 10">
 			<template v-slot:default><span class="value">{{ inRange }}%</span></template>
 		</v-progress-circular>
 	</div>
@@ -22,6 +22,10 @@ export default {
 		showTitle: {
 			type: Boolean,
 			default: true
+		},
+		size: {
+			type: Number,
+			default: 70
 		}
 	},
 	data() {
@@ -61,6 +65,6 @@ export default {
 }
 
 .value {
-	font-size: 1.5em;
+	font-size: 1.3em;
 }
 </style>
