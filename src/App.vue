@@ -36,69 +36,12 @@
 
 					<!-- HORIZONTAL LAYOUT -->
 					<v-row v-if="isHorizontal" class="d-flex">
-						<v-col cols="9" class="d-flex align-stretch">
-							<v-card class="w-100 d-flex">
-								<v-card-text class="flex-grow-1">
-									<BloodGlucoseChartDES :readings="history"></BloodGlucoseChartDES>
-								</v-card-text>
-							</v-card>
-						</v-col>
-						<v-col cols="3">
-							<v-row>
-								<v-col cols="12">
-									<v-card>
-										<v-card-text>
-											<InRangeDay :history="history"></InRangeDay>
-										</v-card-text>
-									</v-card>
-								</v-col>
-								<v-col cols="12">
-									<v-card>
-										<v-card-text>
-											<AverageDay :history="history"></AverageDay>
-										</v-card-text>
-									</v-card>
-								</v-col>
-							</v-row>
-						</v-col>
+						<HorizontalView :history="history"></HorizontalView>
 					</v-row>
 
 					<!-- VERTICAL LAYOUT -->
 					<div v-else class="mt-4 flex-grow-1">
-						<v-row>
-							<v-col cols="12">
-								<v-card>
-									<v-card-text>
-										<BloodGlucoseChartDES :readings="history" :amount-of-data-points="30" style="height: 200px"></BloodGlucoseChartDES>
-									</v-card-text>
-								</v-card>
-							</v-col>
-						</v-row>
-						<v-row>
-							<v-col cols="6">
-								<v-card>
-									<v-card-text>
-										<InRangeDay :history="history"></InRangeDay>
-									</v-card-text>
-								</v-card>
-							</v-col>
-							<v-col cols="6">
-								<v-card>
-									<v-card-text>
-										<AverageDay :history="history"></AverageDay>
-									</v-card-text>
-								</v-card>
-							</v-col>
-						</v-row>
-						<v-row>
-							<v-col cols="12">
-								<v-card>
-									<v-card-text>
-										<DailyBloodGlucoseChart :readings="history" :amount-of-data-points="12 * 24" style="height: 100px"></DailyBloodGlucoseChart>
-									</v-card-text>
-								</v-card>
-							</v-col>
-						</v-row>
+						<VerticalView :history="history"></VerticalView>
 					</div>
 				</div>
 			</v-container>
@@ -129,19 +72,16 @@ onUnmounted(() => {
 
 <script>
 import MainValue from './components/MainValue.vue';
-import InRangeDay from './components/InRangeDay.vue';
-import AverageDay from './components/AverageDay.vue';
-import DailyBloodGlucoseChart from './components/DailyBloodGlucoseChart.vue';
-import BloodGlucoseChartDES from './components/BloodGlucoseChartDES.vue';
 import moment from 'moment';
+import HorizontalView from './views/HorizontalView.vue';
+import VerticalView from './views/VerticalView.vue';
 
 // const Client = require('./dexcom/dexcom-mock.js');
 const Client = require('./dexcom/dexcom.js');
 
 export default {
 	components: {
-		MainValue,
-		BloodGlucoseChartDES,
+		MainValue, HorizontalView, VerticalView
 	},
 	data() {
 		return {

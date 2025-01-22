@@ -1,0 +1,59 @@
+<template>
+	<v-row>
+		<v-col cols="12">
+			<v-card>
+				<v-card-text>
+					<BloodGlucoseChartDES :readings="history" :amount-of-data-points="30" style="height: 200px"></BloodGlucoseChartDES>
+				</v-card-text>
+			</v-card>
+		</v-col>
+	</v-row>
+	<v-row>
+		<v-col cols="6">
+			<v-card>
+				<v-card-text>
+					<InRangeDay :history="history"></InRangeDay>
+				</v-card-text>
+			</v-card>
+		</v-col>
+		<v-col cols="6">
+			<v-card>
+				<v-card-text>
+					<AverageDay :history="history"></AverageDay>
+				</v-card-text>
+			</v-card>
+		</v-col>
+	</v-row>
+	<v-row>
+		<v-col cols="12">
+			<v-card>
+				<v-card-text>
+					<DailyBloodGlucoseChart :readings="history" :amount-of-data-points="12 * 24" style="height: 100px"></DailyBloodGlucoseChart>
+				</v-card-text>
+			</v-card>
+		</v-col>
+	</v-row>
+</template>
+
+<script>
+import InRangeDay from '../components/InRangeDay.vue';
+import AverageDay from '../components/AverageDay.vue';
+import DailyBloodGlucoseChart from '../components/DailyBloodGlucoseChart.vue';
+import BloodGlucoseChartDES from '../components/BloodGlucoseChartDES.vue';
+
+export default {
+	name: 'VerticalView',
+	components: {
+		AverageDay,
+		InRangeDay,
+		DailyBloodGlucoseChart,
+		BloodGlucoseChartDES,
+	},
+	props: {
+		history: {
+			type: Array,
+			required: true
+		},
+	}
+}
+</script>
