@@ -1,10 +1,10 @@
 <template>
-	<div class="text-center">
-		<p v-if="showTitle" class="muted mb-4 mt-4 float-left">Range</p>
+	<span v-if="valueOnly">{{ inRange }}%</span>
+	<div v-else class="text-center">
+		<p class="muted mt-4 float-left">In range</p>
 		<v-progress-circular v-if="size > 0" :model-value="inRange" :size="size" :width="size / 10">
 			<template v-slot:default><span class="value">{{ inRange }}%</span></template>
 		</v-progress-circular>
-		<p v-else class="value">{{ inRange }}%</p>
 	</div>
 </template>
 
@@ -20,9 +20,9 @@ export default {
 				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" }
 			]
 		},
-		showTitle: {
+		valueOnly: {
 			type: Boolean,
-			default: true
+			default: false
 		},
 		size: {
 			type: Number,
