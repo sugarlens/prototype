@@ -6,7 +6,7 @@
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, Filler } from 'chart.js';
-import { horizontalFillPlugin } from './chartUtils.js';
+import { horizontalFillPlugin, chartAreaBorderPlugin } from './chartUtils.js';
 
 const optimalMin = 4;
 const optimalMax = 10;
@@ -34,7 +34,7 @@ export default {
 		}
 	},
 	setup() {
-		ChartJS.register(horizontalFillPlugin);
+		ChartJS.register(horizontalFillPlugin, chartAreaBorderPlugin);
 	},
 	data() {
 		return {
@@ -76,6 +76,10 @@ export default {
 						startValue: optimalMin,
 						endValue: optimalMax,
 					},
+					chartAreaBorderPlugin: {
+						borderColor: '#333333',
+						borderWidth: 1,
+					}
 				},
 			}
 		};
