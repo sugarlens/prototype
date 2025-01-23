@@ -1,5 +1,6 @@
 <template>
-	<div class="text-center">
+	<span v-if="valueOnly">{{ average.toFixed(1) }}</span>
+	<div v-else class="text-center">
 		<p class="muted vertical float-left mt-3">Average</p>
 		<p class="large">{{ average.toFixed(1) }}</p>
 		<p class="muted">mmol/l</p>
@@ -17,6 +18,10 @@ export default {
 				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" },
 				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" }
 			]
+		},
+		valueOnly: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {

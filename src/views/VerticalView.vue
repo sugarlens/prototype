@@ -42,7 +42,13 @@
 	</v-row>
 	<v-row>
 		<v-col cols="12">
-			<p>Today (<InRangeDay :valueOnly="true" :history="history.slice(-readingsToday)" :size="0" class="mt-6" /> in range)</p>
+			<p>
+				Today
+				<span class="muted">
+					(<InRangeDay :valueOnly="true" :history="history.slice(-readingsToday)" /> in range, 
+					<AverageDay :valueOnly="true" :history="history.slice(-readingsToday)"></AverageDay> mmol/l)
+				</span>
+			</p>
 		</v-col>
 	</v-row>
 	<v-row>
@@ -95,3 +101,10 @@ export default {
 	},
 }
 </script>
+
+<style scoped>
+.muted {
+	opacity: 0.5;
+	font-size: .9em;
+}
+</style>
