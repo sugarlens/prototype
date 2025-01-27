@@ -43,10 +43,10 @@
 	<v-row>
 		<v-col cols="12">
 			<p>
-				Today
+				Today &mdash;
 				<span class="muted">
-					(<InRangeDay :valueOnly="true" :history="history.slice(-readingsToday)" /> in range, 
-					<AverageDay :valueOnly="true" :history="history.slice(-readingsToday)"></AverageDay> mmol/l)
+					<InRangeDay :valueOnly="true" :history="history.slice(-readingsToday)" /> &mdash;
+					<AverageDay :valueOnly="true" :history="history.slice(-readingsToday)"></AverageDay> mmol/l
 				</span>
 			</p>
 		</v-col>

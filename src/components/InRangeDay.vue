@@ -1,5 +1,5 @@
 <template>
-	<span v-if="valueOnly">{{ inRange }}%</span>
+	<span v-if="valueOnly">{{ inRange }}% in range <small>[{{ max }}%, {{ min }}%]</small></span>
 	<div v-else class="text-center">
 		<p class="muted mt-4 float-left">In range</p>
 		<v-progress-circular v-if="size > 0" :model-value="inRange" :size="size" :width="size / 10">
@@ -31,7 +31,9 @@ export default {
 	},
 	data() {
 		return {
-			inRange: 0
+			inRange: 0,
+			min: 0,
+			max: 100
 		}
 	},
 	watch: {
@@ -48,6 +50,12 @@ export default {
 
 			const inRange = history.filter((reading) => reading.mmol >= 4 && reading.mmol <= 10).length;
 			this.inRange = Math.round((inRange / history.length) * 100);
+
+			const now = new Date();
+			const readingsInDay = 24*60 / 5;
+			const missingReadings = Math.round((24*60 - (now.getHours() * 60 + now.getMinutes())) / 5);
+			this.min = Math.round(inRange / readingsInDay * 100);
+			this.max = Math.round((inRange + missingReadings) / readingsInDay * 100);
 		}
 	},
 	mounted() {
@@ -67,5 +75,9 @@ export default {
 
 .value {
 	font-size: 1.3em;
+}
+
+small {
+	opacity: 0.75;
 }
 </style>
