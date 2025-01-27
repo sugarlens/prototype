@@ -115,9 +115,10 @@ export default {
 			const times = newReadings.map((reading) => reading.time);
 			if (this.fillDay) {
 				const lastTime = new Date(times[times.length - 1]);
-				for (let i = 0; i < 24 - lastTime.getHours(); i++) {
+				for (let i = 1; i <= 24 - lastTime.getHours(); i++) {
 					const newTime = new Date(lastTime);
 					newTime.setHours(lastTime.getHours() + i);
+					newTime.setMinutes(0);
 					times.push(newTime.toISOString());
 				}
 			}
