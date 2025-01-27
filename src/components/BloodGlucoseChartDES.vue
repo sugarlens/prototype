@@ -86,8 +86,12 @@ export default {
 				return;
 			}
 
+			// Consider only the last amountOfDataPoints readings
+			var newReadings = readings.slice(-this.amountOfDataPoints);
+			var smoothedReadings = smoothData(readings.map((reading) => reading.mmol)).slice(-this.amountOfDataPoints);
+
 			// Add the average glucose as a horizontal line
-			const averageGlucose = calculateAverage(readings);
+			const averageGlucose = calculateAverage(newReadings);
 			if (this.chartOptions.horizontalLines.length > 2) {
 				this.chartOptions.horizontalLines.pop();
 			}
@@ -97,10 +101,6 @@ export default {
 				lineWidth: 3,
 				dash: [7, 3],
 			});
-
-			// Consider only the last amountOfDataPoints readings
-			var newReadings = readings.slice(-this.amountOfDataPoints);
-			var smoothedReadings = smoothData(readings.map((reading) => reading.mmol)).slice(-this.amountOfDataPoints);
 
 			// Extract times and glucose values from the readings prop
 			const glucoseValues = newReadings.map((reading) => ({
