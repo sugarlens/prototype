@@ -1,5 +1,5 @@
 <template>
-	<span v-if="valueOnly">TIR: {{ inRange }}% <small>[{{ max }}%, {{ min }}%]</small></span>
+	<span v-if="valueOnly">TIR: {{ inRange }}% <small>[{{ min }}%, {{ max }}%]</small></span>
 	<div v-else class="text-center">
 		<p class="muted mt-4 float-left">In range</p>
 		<v-progress-circular v-if="size > 0" :model-value="inRange" :size="size" :width="size / 10">
