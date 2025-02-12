@@ -1,16 +1,16 @@
 <template>
-	<span v-if="valueOnly">TIR: {{ inRange }}% <small>[{{ max }}%, {{ min }}%]</small></span>
+	<span v-if="valueOnly">TITR: {{ inTightRange }}% <small v-if="forecast">[{{ max }}%, {{ min }}%]</small></span>
 	<div v-else class="text-center">
-		<p class="muted mt-4 float-left">In range</p>
-		<v-progress-circular v-if="size > 0" :model-value="inRange" :size="size" :width="size / 10">
-			<template v-slot:default><span class="value">{{ inRange }}%</span></template>
+		<p class="muted mt-4 float-left">In tight range</p>
+		<v-progress-circular v-if="size > 0" :model-value="inTightRange" :size="size" :width="size / 10">
+			<template v-slot:default><span class="value">{{ inTightRange }}%</span></template>
 		</v-progress-circular>
 	</div>
 </template>
 
 <script>
 export default {
-	name: 'InRangeDay',
+	name: 'inTightRange',
 	props: {
 		history: {
 			type: Array,
@@ -24,6 +24,10 @@ export default {
 			type: Boolean,
 			default: false
 		},
+		forecast: {
+			type: Boolean,
+			default: true
+		},
 		size: {
 			type: Number,
 			default: 70
@@ -31,7 +35,7 @@ export default {
 	},
 	data() {
 		return {
-			inRange: 0,
+			inTightRange: 0,
 			min: 0,
 			max: 100
 		}
@@ -45,17 +49,17 @@ export default {
 	methods: {
 		updateInRange(history) {
 			if (!history || history.length === 0) {
-				this.inRange = 0;
+				this.inTightRange = 0;
 			}
 
-			const inRange = history.filter((reading) => reading.mmol >= 4 && reading.mmol <= 10).length;
-			this.inRange = Math.round((inRange / history.length) * 100);
+			const inTightRange = history.filter((reading) => reading.mmol > 3.8 && reading.mmol <= 7.8).length;
+			this.inTightRange = Math.round((inTightRange / history.length) * 100);
 
 			const now = new Date();
 			const readingsInDay = 24*60 / 5;
 			const missingReadings = Math.round((24*60 - (now.getHours() * 60 + now.getMinutes())) / 5);
-			this.min = Math.round(inRange / readingsInDay * 100);
-			this.max = Math.round((inRange + missingReadings) / readingsInDay * 100);
+			this.min = Math.round(inTightRange / readingsInDay * 100);
+			this.max = Math.round((inTightRange + missingReadings) / readingsInDay * 100);
 		}
 	},
 	mounted() {

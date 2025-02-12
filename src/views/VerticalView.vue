@@ -11,6 +11,10 @@
 	</v-row>
 	<v-row>
 		<v-col cols="12">
+			<div class="float-right text-right muted">
+				
+				<InTightRangeDay :valueOnly="true" :forecast="false" :history="history" />
+			</div>
 			<p>Last 24 hours</p>
 		</v-col>
 	</v-row>
@@ -42,13 +46,12 @@
 	</v-row>
 	<v-row>
 		<v-col cols="12">
-			<p>
-				Today &mdash;
-				<span class="muted">
-					<InRangeDay :valueOnly="true" :history="history.slice(-readingsToday)" /> &mdash;
-					<AverageDay :valueOnly="true" :history="history.slice(-readingsToday)"></AverageDay> mmol/l
-				</span>
-			</p>
+			<div class="float-right text-right muted">
+				<InRangeDay :valueOnly="true" :history="history.slice(-readingsToday)" /> &mdash;
+				<InTightRangeDay :valueOnly="true" :history="history.slice(-readingsToday)" /><br>
+				Average: <AverageDay :valueOnly="true" :history="history.slice(-readingsToday)"></AverageDay> mmol/l
+			</div>
+			<p>Today</p>	
 		</v-col>
 	</v-row>
 	<v-row>
@@ -65,6 +68,7 @@
 
 <script>
 import InRangeDay from '../components/InRangeDay.vue';
+import InTightRangeDay from '../components/InTightRangeDay.vue';
 import AverageDay from '../components/AverageDay.vue';
 import DailyBloodGlucoseChart from '../components/DailyBloodGlucoseChart.vue';
 import BloodGlucoseChartDES from '../components/BloodGlucoseChartDES.vue';
@@ -74,6 +78,7 @@ export default {
 	components: {
 		AverageDay,
 		InRangeDay,
+		InTightRangeDay,
 		DailyBloodGlucoseChart,
 		BloodGlucoseChartDES,
 	},
