@@ -1,5 +1,8 @@
 <template>
-	<span v-if="valueOnly">TITR: {{ inTightRange }}% <small v-if="forecast">[{{ min }}%, {{ max }}%]</small></span>
+	<span v-if="valueOnly">
+		<span :class="(inTightRange >= 50)? 'readingIn' : 'readingOut'">TITR: {{ inTightRange }}%</span>&nbsp;
+		<span :class="(history[history.length -1] > 3.8 && history[history.length -1] <= 7.8)? 'readingIn' : 'readingOut'">&#11044;</span>&nbsp;
+		<small v-if="forecast">[{{ min }}%, {{ max }}%]</small></span>
 	<div v-else class="text-center">
 		<p class="muted mt-4 float-left">In tight range</p>
 		<v-progress-circular v-if="size > 0" :model-value="inTightRange" :size="size" :width="size / 10">
@@ -83,5 +86,13 @@ export default {
 
 small {
 	opacity: 0.75;
+}
+
+.readingIn {
+	color: #5F5;
+}
+
+.readingOut {
+	color: #FAA;
 }
 </style>
