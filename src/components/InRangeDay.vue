@@ -1,7 +1,7 @@
 <template>
 	<span v-if="valueOnly">
 		<span :class="(inRange >= 70)? 'readingIn' : 'readingOut'">TIR: {{ inRange }}%</span>&nbsp;
-		<span :class="(history[history.length -1] >= 4 && history[history.length -1] <= 10)? 'readingIn' : 'readingOut'">&#11044;</span>&nbsp;
+		<span :class="(history[history.length -1].mmol >= 4 && history[history.length -1].mmol <= 10)? 'readingIn' : 'readingOut'">&#11044;</span>&nbsp;
 		<small>[{{ min }}%, {{ max }}%]</small></span>
 	<div v-else class="text-center">
 		<p class="muted mt-4 float-left">In range</p>
