@@ -1,7 +1,7 @@
 <template>
 	<span v-if="valueOnly">
 		<span :class="(inTightRange >= 50)? 'readingIn' : 'readingOut'">TITR: {{ inTightRange }}%</span>&nbsp;
-		<span :class="(history[history.length -1] > 3.8 && history[history.length -1] <= 7.8)? 'readingIn' : 'readingOut'">&#11044;</span>&nbsp;
+		<span :class="(history[history.length -1].mmol > 3.8 && history[history.length -1].mmol <= 7.8)? 'readingIn' : 'readingOut'">&#11044;</span>&nbsp;
 		<small v-if="forecast">[{{ min }}%, {{ max }}%]</small></span>
 	<div v-else class="text-center">
 		<p class="muted mt-4 float-left">In tight range</p>
