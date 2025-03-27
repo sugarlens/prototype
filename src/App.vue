@@ -164,7 +164,7 @@ export default {
 						document.title = 
 							latestReading.mmol + " " +
 							latestReading.trend.arrow +  " " +
-							moment(latestReading.time).fromNow();
+							moment(latestReading.time).format('H:mm');
 					}
 				);
 			}
