@@ -160,6 +160,11 @@ export default {
 					(data) => {
 						this.history = data.reverse();
 						this.dataRetrieved = true;
+						var latestReading = this.history[this.history.length - 1];
+						document.title = 
+							latestReading.mmol + " " +
+							latestReading.trend.arrow +  " " +
+							moment(latestReading.time).fromNow();
 					}
 				);
 			}
