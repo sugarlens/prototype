@@ -34,14 +34,21 @@
 						</v-col>
 					</v-row>
 
-					<!-- HORIZONTAL LAYOUT -->
-					<v-row v-if="isHorizontal" class="d-flex">
-						<HorizontalView :history="history"></HorizontalView>
-					</v-row>
+					<!-- MOBILE DEVICE -->
+					<div v-if="isMobile">
+						<!-- HORIZONTAL LAYOUT -->
+						<v-row v-if="isHorizontal" class="d-flex mt-4">
+							<HorizontalView :history="history"></HorizontalView>
+						</v-row>
 
-					<!-- VERTICAL LAYOUT -->
+						<!-- VERTICAL LAYOUT -->
+						<div v-else class="mt-4 flex-grow-1">
+							<VerticalView :history="history"></VerticalView>
+						</div>
+					</div>
+					<!-- DESKTOP DEVICE -->
 					<div v-else class="mt-4 flex-grow-1">
-						<VerticalView :history="history"></VerticalView>
+						<DesktopView :history="history"></DesktopView>
 					</div>
 				</div>
 			</v-container>
@@ -53,11 +60,16 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 
-// Detect screen orientation
+// Detect screen orientation and device type
 const isHorizontal = ref(window.innerHeight < window.innerWidth);
+const isMobile = ref(isMobileDevice());
 
 function updateOrientation() {
 	isHorizontal.value = window.innerHeight < window.innerWidth;
+}
+
+function isMobileDevice() {
+  return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
 onMounted(() => {
@@ -75,13 +87,14 @@ import MainValue from './components/MainValue.vue';
 import moment from 'moment';
 import HorizontalView from './views/HorizontalView.vue';
 import VerticalView from './views/VerticalView.vue';
+import DesktopView from './views/DesktopView.vue';
 
 // const Client = require('./dexcom/dexcom-mock.js');
 const Client = require('./dexcom/dexcom.js');
 
 export default {
 	components: {
-		MainValue, HorizontalView, VerticalView
+		MainValue, HorizontalView, VerticalView, DesktopView
 	},
 	data() {
 		return {
