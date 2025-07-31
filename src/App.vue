@@ -175,7 +175,7 @@ export default {
 						this.dataRetrieved = true;
 						var latestReading = this.history[this.history.length - 1];
 						document.title = 
-							latestReading.mmol + " " +
+							latestReading.mmol.toFixed(1) + " " +
 							latestReading.trend.arrow +  " " +
 							moment(latestReading.time).format('H:mm');
 					}
