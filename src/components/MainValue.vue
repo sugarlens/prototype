@@ -1,6 +1,12 @@
 <template>
 	<v-card>
 		<v-card-text>
+			<v-progress-circular
+				:size="40"
+				:width="10"
+				:model-value="this.secondsRotation"
+				color="blue-grey"
+				class="float-right ml-4"></v-progress-circular>
 			<div class="float-right text-end class-muted">
 				<p>{{ now }}</p>
 				<p v-if="latestEntry && secondLatestEntry">&Delta;: {{ delta }} mmol/l</p>
@@ -9,6 +15,8 @@
 				{{ latestEntry.mmol.toFixed(1) }}
 				<span v-html="adjustArrows(latestEntry.trend.arrow)"></span>
 			</p>
+			
+
 		</v-card-text>
 	</v-card>
 </template>
@@ -30,6 +38,8 @@ export default {
 	data() {
 		return {
 			now: "&nbsp;",
+			secondsRotation: 0,
+			timerRotation: null
 		};
 	},
 	methods: {
@@ -40,6 +50,7 @@ export default {
 			} else {
 				this.now = moment(this.history[this.history.length - 1].time).fromNow(); // ok with more fuzzy text
 			}
+			this.secondsRotation = moment().diff(moment(this.history[this.history.length - 1].time), 'seconds') / 3;
 		},
 		adjustArrows(arrow) {
 			if (arrow === '↑') return '&uarr;';
@@ -80,10 +91,15 @@ export default {
 	},
 	mounted() {
 		this.updateNow();
-		this.timer = setInterval(this.updateNow, 10 * 1000);
+		this.timerRotation = setInterval(() => {
+			this.secondsRotation += 3;
+			this.updateNow();
+		}, 5000);
+
 	},
 	beforeUnmount() {
-		clearInterval(this.timer);
+		clearInterval(this.timerRotation);
+
 	}
 }
 </script>
