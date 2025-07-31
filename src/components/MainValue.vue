@@ -1,16 +1,19 @@
 <template>
 	<v-card>
 		<v-card-text>
-			<v-progress-circular
-				:size="40"
-				:width="10"
-				:model-value="this.secondsRotation"
-				color="blue-grey"
-				class="float-right ml-4"></v-progress-circular>
 			<div class="float-right text-end class-muted">
-				<p>{{ now }}</p>
+				<p>
+					<v-progress-circular
+						:size="20"
+						:width="10"
+						:model-value="this.secondsRotation"
+						color="blue-grey"
+						class="mr-1"></v-progress-circular>
+					{{ now }}
+				</p>
 				<p v-if="latestEntry && secondLatestEntry">&Delta;: {{ delta }} mmol/l</p>
 			</div>
+			
 			<p :class="{ 'large-text': true, 'stale': isReadingStale }">
 				{{ latestEntry.mmol.toFixed(1) }}
 				<span v-html="adjustArrows(latestEntry.trend.arrow)"></span>
