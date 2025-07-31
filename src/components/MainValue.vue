@@ -34,7 +34,12 @@ export default {
 	},
 	methods: {
 		updateNow() {
-			this.now = moment(this.history[this.history.length - 1].time).fromNow();
+			this.now = -moment(this.history[this.history.length - 1].time).diff(moment(), 'minutes');
+			if (this.now > 3 && this.now < 6) { // necessary to handle the time before new reading arrives
+				this.now = `${this.now} minutes ago`; // we want precise minutes
+			} else {
+				this.now = moment(this.history[this.history.length - 1].time).fromNow(); // ok with more fuzzy text
+			}
 		},
 		adjustArrows(arrow) {
 			if (arrow === '↑') return '&uarr;';
