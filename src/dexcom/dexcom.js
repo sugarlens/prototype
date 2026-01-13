@@ -3,6 +3,8 @@
  * This project is licensed under the MIT License - see the LICENSE file for details.
  */
 
+const { getTranslatedValue } = require("./valueparser")
+
 const Client = (function () {
 	/****** GLOBAL VARIABLES ******/
 	const APP_ID = "d89443d2-327c-4a6f-89e5-496bbb0317db"
@@ -12,8 +14,7 @@ const Client = (function () {
 
 	const ENDPOINT_LOGIN = "/General/LoginPublisherAccountById"
 	const ENDPOINT_AUTHENTICATE = "/General/AuthenticatePublisherAccount"
-	const ENDPOINT_GLUCOSE_READINGS =
-		"/Publisher/ReadPublisherLatestGlucoseValues"
+	const ENDPOINT_GLUCOSE_READINGS = "/Publisher/ReadPublisherLatestGlucoseValues"
 
 	const DEFAULT_SESSION_ID = "00000000-0000-0000-0000-000000000000"
 
@@ -49,8 +50,6 @@ const Client = (function () {
 			arrow: "-",
 		},
 	}
-
-	const MMOLL_TO_MGDL_CONVERTION_FACTOR = 0.0555 // (mmol/L) = (mg/dl) * 0.0555
 
 	class Client {
 		constructor(OutOfUS = false) {
@@ -136,11 +135,7 @@ const Client = (function () {
 		_processReadings(reading) {
 			return {
 				trend: TREND_DESCRIPTIONS[reading.Trend],
-				mgdl: reading.Value,
-				mmol:
-					Math.round(
-						reading.Value * MMOLL_TO_MGDL_CONVERTION_FACTOR * 10
-					) / 10,
+				value: getTranslatedValue(reading),
 				time: new Date(
 					parseInt(reading.WT.replace("Date(", "").replace(")", ""))
 				),

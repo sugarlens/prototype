@@ -15,7 +15,7 @@
 			</div>
 			
 			<p :class="{ 'large-text': true, 'stale': isReadingStale }">
-				{{ latestEntry.mmol.toFixed(1) }}
+				{{ latestEntry.value.toFixed(1) }}
 				<span v-html="adjustArrows(latestEntry.trend.arrow)"></span>
 			</p>
 			
@@ -33,8 +33,8 @@ export default {
 			type: Array,
 			required: true,
 			default: () => [
-				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" },
-				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" }
+				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "value": 0, "time": "2000-01-01T00:00:01.000Z" },
+				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "value": 0, "time": "2000-01-01T00:00:01.000Z" }
 			]
 		}
 	},
@@ -75,7 +75,7 @@ export default {
 		},
 		delta() {
 			if (!this.latestEntry || !this.secondLatestEntry) return null;
-			const diff = this.latestEntry.mmol - this.secondLatestEntry.mmol;
+			const diff = this.latestEntry.value - this.secondLatestEntry.value;
 			return diff > 0 ? `+${diff.toFixed(1)}` : diff.toFixed(1);
 		},
 		isReadingStale() {

@@ -3,13 +3,15 @@
 </template>
 
 <script>
+import { IN_RANGE_MIN, IN_RANGE_MAX } from '../dexcom/valueparser';
+
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, Filler } from 'chart.js';
 import { horizontalFillPlugin, chartAreaBorderPlugin } from './chartUtils.js';
 
-const optimalMin = 4;
-const optimalMax = 10;
+const optimalMin = IN_RANGE_MIN;
+const optimalMax = IN_RANGE_MAX;
 
 // Register the necessary Chart.js components
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, Filler);
@@ -122,7 +124,7 @@ export default {
 					times.push(newTime.toISOString());
 				}
 			}
-			const glucoseValues = newReadings.map((reading) => reading.mmol);
+			const glucoseValues = newReadings.map((reading) => reading.value);
 
 			// Calculate the areas to fill
 			const aboveOptimalMax = glucoseValues.map((value) => (value > optimalMax ? value : null));
@@ -161,7 +163,7 @@ export default {
 		},
 		calculateAverage(readings) {
 			if (!readings || readings.length === 0) return 0;
-			const total = readings.reduce((sum, reading) => sum + reading.mmol, 0);
+			const total = readings.reduce((sum, reading) => sum + reading.value, 0);
 			return total / readings.length;
 		},
 	},

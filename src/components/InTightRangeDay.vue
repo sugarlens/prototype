@@ -1,7 +1,7 @@
 <template>
 	<span v-if="valueOnly">
 		<span :class="(inTightRange >= 50)? 'readingIn' : 'readingOut'">TITR: {{ inTightRange }}%</span>&nbsp;
-		<span :class="(history[history.length -1].mmol > 3.8 && history[history.length -1].mmol <= 7.8)? 'readingIn' : 'readingOut'">&#11044;</span>&nbsp;
+		<span :class="(history[history.length -1].value > IN_TIGHT_RANGE_MIN && history[history.length -1].value <= IN_TIGHT_RANGE_MAX)? 'readingIn' : 'readingOut'">&#11044;</span>&nbsp;
 		<small v-if="forecast">[{{ min }}%, {{ max }}%]</small></span>
 	<div v-else class="text-center">
 		<p class="muted mt-4 float-left">In tight range</p>
@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { IN_TIGHT_RANGE_MIN, IN_TIGHT_RANGE_MAX } from '../dexcom/valueparser';
+
 export default {
 	name: 'inTightRange',
 	props: {
@@ -19,8 +21,8 @@ export default {
 			type: Array,
 			required: true,
 			default: () => [
-				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" },
-				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" }
+				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "value": 0, "time": "2000-01-01T00:00:01.000Z" },
+				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "value": 0, "time": "2000-01-01T00:00:01.000Z" }
 			]
 		},
 		valueOnly: {
@@ -40,7 +42,9 @@ export default {
 		return {
 			inTightRange: 0,
 			min: 0,
-			max: 100
+			max: 100,
+			IN_TIGHT_RANGE_MIN: IN_TIGHT_RANGE_MIN,
+			IN_TIGHT_RANGE_MAX: IN_TIGHT_RANGE_MAX
 		}
 	},
 	watch: {
@@ -55,7 +59,7 @@ export default {
 				this.inTightRange = 0;
 			}
 
-			const inTightRange = history.filter((reading) => reading.mmol > 3.8 && reading.mmol <= 7.8).length;
+			const inTightRange = history.filter((reading) => reading.value > IN_TIGHT_RANGE_MIN && reading.value <= IN_TIGHT_RANGE_MAX).length;
 			this.inTightRange = Math.round((inTightRange / history.length) * 100);
 
 			const now = new Date();

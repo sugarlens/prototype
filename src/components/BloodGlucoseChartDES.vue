@@ -3,15 +3,17 @@
 </template>
 
 <script>
+import { IN_RANGE_MIN, IN_RANGE_MAX, CHART_MIN, CHART_MAX } from '../dexcom/valueparser';
+
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
 import { smoothData, getColorForReading, getActualReading, horizontalLinePlugin, futureBackgroundPlugin, calculateAverage } from './chartUtils';
 
-const minValue = 2;
-const maxValue = 20;
-const optimalMin = 4;
-const optimalMax = 10;
+const minValue = CHART_MIN;
+const maxValue = CHART_MAX;
+const optimalMin = IN_RANGE_MIN;
+const optimalMax = IN_RANGE_MAX;
 
 // Register the necessary Chart.js components
 ChartJS.register(Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement, horizontalLinePlugin, futureBackgroundPlugin);
@@ -88,7 +90,7 @@ export default {
 
 			// Consider only the last amountOfDataPoints readings
 			var newReadings = readings.slice(-this.amountOfDataPoints);
-			var smoothedReadings = smoothData(readings.map((reading) => reading.mmol)).slice(-this.amountOfDataPoints);
+			var smoothedReadings = smoothData(readings.map((reading) => reading.value)).slice(-this.amountOfDataPoints);
 
 			// Add the average glucose as a horizontal line
 			const averageGlucose = calculateAverage(newReadings);
@@ -105,16 +107,16 @@ export default {
 			// Extract times and glucose values from the readings prop
 			const glucoseValues = newReadings.map((reading) => ({
 				x: reading.time,
-				y: getActualReading(reading.mmol, minValue, maxValue)
+				y: getActualReading(reading.value, minValue, maxValue)
 			}));
-			const colorsActualReadings = newReadings.map((reading) => getColorForReading(reading.mmol, minValue, maxValue, optimalMin, optimalMax, 0.3));
+			const colorsActualReadings = newReadings.map((reading) => getColorForReading(reading.value, minValue, maxValue, optimalMin, optimalMax, 0.3));
 			const colorsSmoothedReadings = smoothedReadings.map((reading) => getColorForReading(reading, minValue, maxValue, optimalMin, optimalMax, 0.9));
 			const lastTime = readings[readings.length - 1].time;
 
 			// DES prediction
 			const zodiac = require("zodiac-ts");
 			var alpha = 0;
-			var ses = new zodiac.DoubleExponentialSmoothing(readings.map((reading) => reading.mmol), alpha);
+			var ses = new zodiac.DoubleExponentialSmoothing(readings.map((reading) => reading.value), alpha);
 			ses.optimizeParameter(20);
 			var forecast = ses.predict(3).slice(-3);
 			const futureDESPoints = forecast.map((value, index) => ({

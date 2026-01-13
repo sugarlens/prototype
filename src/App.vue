@@ -107,7 +107,7 @@ export default {
 			dataRetrieved: false,
 			dexcomClient: null,
 			history: [
-				{ "time": "2000-01-01 00:00", "mmol": 0, "trend": { "name": "", "desc": "", "arrow": "" } },
+				{ "time": "2000-01-01 00:00", "value": 0, "trend": { "name": "", "desc": "", "arrow": "" } },
 			],
 			rules: {
 				required: value => !!value || 'This field is required',
@@ -175,7 +175,7 @@ export default {
 						this.dataRetrieved = true;
 						var latestReading = this.history[this.history.length - 1];
 						document.title = 
-							latestReading.mmol.toFixed(1) + " " +
+							latestReading.value.toFixed(1) + " " +
 							latestReading.trend.arrow +  " " +
 							moment(latestReading.time).format('H:mm');
 					}

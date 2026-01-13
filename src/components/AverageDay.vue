@@ -3,11 +3,14 @@
 	<div v-else class="text-center">
 		<p class="muted vertical float-left mt-3">Average</p>
 		<p class="large">{{ average.toFixed(1) }}</p>
-		<p class="muted">mmol/l</p>
+		<p class="muted">{{ label }}</p>
 	</div>
 </template>
 
 <script>
+
+import { UNITS_LABEL } from '../dexcom/valueparser';
+
 export default {
 	name: 'InRangeDay',
 	props: {
@@ -15,8 +18,8 @@ export default {
 			type: Array,
 			required: true,
 			default: () => [
-				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" },
-				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" }
+				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "value": 0, "time": "2000-01-01T00:00:01.000Z" },
+				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "value": 0, "time": "2000-01-01T00:00:01.000Z" }
 			]
 		},
 		valueOnly: {
@@ -26,7 +29,8 @@ export default {
 	},
 	data() {
 		return {
-			average: 0
+			average: 0,
+			label: UNITS_LABEL
 		}
 	},
 	watch: {
@@ -41,7 +45,7 @@ export default {
 				this.average = 0;
 			}
 
-			const sum = history.reduce((acc, reading) => acc + reading.mmol, 0);
+			const sum = history.reduce((acc, reading) => acc + reading.value, 0);
 			this.average = Math.round((sum / history.length) * 10) / 10;
 		}
 	},

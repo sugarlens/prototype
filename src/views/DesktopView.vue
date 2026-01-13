@@ -55,7 +55,7 @@
 			</div>
 			<p>
 				Today<br>
-				<span class="muted">Average: <AverageDay :valueOnly="true" :history="history.slice(-readingsToday)"></AverageDay> mmol/l</span>
+				<span class="muted">Average: <AverageDay :valueOnly="true" :history="history.slice(-readingsToday)"></AverageDay> {{ UNITS_LABEL }}</span>
 			</p>	
 		</v-col>
 	</v-row>
@@ -72,6 +72,7 @@
 </template>
 
 <script>
+import { UNITS_LABEL } from '../dexcom/valueparser';
 import InRangeDay from '../components/InRangeDay.vue';
 import InTightRangeDay from '../components/InTightRangeDay.vue';
 import AverageDay from '../components/AverageDay.vue';
@@ -96,6 +97,7 @@ export default {
 	data() {
 		return {
 			readingsToday: 0,
+			UNITS_LABEL: UNITS_LABEL,
 		};
 	},
 	created() {

@@ -1,7 +1,7 @@
 <template>
 	<span v-if="valueOnly">
 		<span :class="(inRange >= 70)? 'readingIn' : 'readingOut'">TIR: {{ inRange }}%</span>&nbsp;
-		<span :class="(history[history.length -1].mmol >= 4 && history[history.length -1].mmol <= 10)? 'readingIn' : 'readingOut'">&#11044;</span>&nbsp;
+		<span :class="(history[history.length -1].value >= IN_RANGE_MIN && history[history.length -1].value <= IN_RANGE_MAX)? 'readingIn' : 'readingOut'">&#11044;</span>&nbsp;
 		<small>[{{ min }}%, {{ max }}%]</small></span>
 	<div v-else class="text-center">
 		<p class="muted mt-4 float-left">In range</p>
@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { IN_RANGE_MIN, IN_RANGE_MAX } from '../dexcom/valueparser';
+
 export default {
 	name: 'InRangeDay',
 	props: {
@@ -19,8 +21,8 @@ export default {
 			type: Array,
 			required: true,
 			default: () => [
-				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" },
-				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "mgdl": 0, "mmol": 0, "time": "2000-01-01T00:00:01.000Z" }
+				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "value": 0, "time": "2000-01-01T00:00:01.000Z" },
+				{ "trend": { "name": "Flat", "desc": "steady", "arrow": "→" }, "value": 0, "time": "2000-01-01T00:00:01.000Z" }
 			]
 		},
 		valueOnly: {
@@ -36,7 +38,9 @@ export default {
 		return {
 			inRange: 0,
 			min: 0,
-			max: 100
+			max: 100,
+			IN_RANGE_MIN: IN_RANGE_MIN,
+			IN_RANGE_MAX: IN_RANGE_MAX
 		}
 	},
 	watch: {
@@ -51,7 +55,7 @@ export default {
 				this.inRange = 0;
 			}
 
-			const inRange = history.filter((reading) => reading.mmol >= 4 && reading.mmol <= 10).length;
+			const inRange = history.filter((reading) => reading.value >= IN_RANGE_MIN && reading.value <= IN_RANGE_MAX).length;
 			this.inRange = Math.round((inRange / history.length) * 100);
 
 			const now = new Date();
