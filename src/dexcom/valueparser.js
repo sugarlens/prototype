@@ -1,4 +1,4 @@
-var european_units = false;
+var european_units = getUnitType();
 
 export const IN_RANGE_MIN = european_units ? 4 : 70;
 export const IN_RANGE_MAX = european_units ? 10 : 180;
@@ -15,4 +15,12 @@ export function getTranslatedValue(reading) {
 	} else {
 		return reading.Value;
 	}
+}
+
+function getUnitType() {
+	const storedCredentials = localStorage.getItem('userCredentials');
+	if (storedCredentials) {
+		return JSON.parse(atob(storedCredentials)).mmolL_units == true;
+	}
+	return true;
 }

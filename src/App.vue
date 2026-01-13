@@ -11,6 +11,7 @@
 							<v-text-field v-model="username" label="Username" :rules="[rules.required]" required></v-text-field>
 							<v-text-field v-model="password" label="Password" :rules="[rules.required]" type="password" required></v-text-field>
 							<v-select v-model="dexcomServer" :items="['US', 'EU']" label="Dexcom Server location" required></v-select>
+							<v-select v-model="mmolL_units" :items="['mmol/L', 'mg/dL']" label="Type of units" required></v-select>
 						</v-form>
 					</v-card-text>
 					<v-card-actions>
@@ -101,6 +102,7 @@ export default {
 			username: '',
 			password: '',
 			dexcomServer: 'EU',
+			mmolL_units: 'mmol/L',
 			valid: false,
 			credentialsProvided: false,
 			isLoggedIn: false,
@@ -129,7 +131,11 @@ export default {
 	},
 	methods: {
 		handleLogin() {
-			const credentials = btoa(JSON.stringify({ username: this.username, password: this.password, dexcomServer: this.dexcomServer }));
+			const credentials = btoa(JSON.stringify({
+				username: this.username,
+				password: this.password,
+				dexcomServer: this.dexcomServer,
+				mmolL_units: this.mmolL_units == 'mmol/L' }));
 			localStorage.setItem('userCredentials', credentials);
 			this.credentialsProvided = true;
 			this.login();
