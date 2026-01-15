@@ -17,6 +17,15 @@ export function getTranslatedValue(reading) {
 	}
 }
 
+export function toggleUnitType() {
+	const storedCredentials = localStorage.getItem('userCredentials');
+	if (storedCredentials) {
+		const credentials = JSON.parse(atob(storedCredentials));
+		credentials.mmolL_units = !credentials.mmolL_units;
+		localStorage.setItem('userCredentials', btoa(JSON.stringify(credentials)));
+	}
+}
+
 function getUnitType() {
 	const storedCredentials = localStorage.getItem('userCredentials');
 	if (storedCredentials) {

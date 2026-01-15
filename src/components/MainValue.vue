@@ -14,7 +14,7 @@
 				<p v-if="latestEntry && secondLatestEntry">&Delta;: {{ delta }} mmol/l</p>
 			</div>
 			
-			<p :class="{ 'large-text': true, 'stale': isReadingStale }">
+			<p :class="{ 'large-text': true, 'stale': isReadingStale }" v-on:click="toggle()">
 				{{ latestEntry.value.toFixed(1) }}
 				<span v-html="adjustArrows(latestEntry.trend.arrow)"></span>
 			</p>
@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import { toggleUnitType } from '@/dexcom/valueparser';
 import moment from 'moment';
 
 export default {
@@ -64,6 +65,10 @@ export default {
 			if (arrow === '⮅') return '&#8648;';
 			if (arrow === '⮇') return '&#8650;';
 			return '?';
+		},
+		toggle() {
+			toggleUnitType();
+			window.location.reload();
 		}
 	},
 	computed: {
