@@ -182,7 +182,7 @@ export const futureBackgroundPlugin = {
 		const firstFutureX = xScale.getPixelForValue(lastPastIndex) + (pointsDifference/2);
 		if (firstFutureX) {
 			ctx.save();
-			ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+			ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
 			ctx.fillRect(firstFutureX, top, chartArea.right - firstFutureX, bottom - top);
 			ctx.restore();
 		}

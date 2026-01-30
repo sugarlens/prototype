@@ -9,12 +9,24 @@ export const CHART_MAX = european_units ? 20 : 400;
 
 export const UNITS_LABEL = european_units ? "mmol/L" : "mg/dL";
 
-export function getTranslatedValue(reading) {
+export function getmgdLValue(reading) {
 	if (european_units) {
-		return Math.round(reading.Value * 0.0555 * 10) / 10;
+		return Math.round(reading * 18);
 	} else {
-		return reading.Value;
+		return reading;
 	}
+}
+
+export function getTranslatedRawValue(value) {
+	if (european_units) {
+		return Math.round(value * 0.0555 * 10) / 10;
+	} else {
+		return value;
+	}
+}
+
+export function getTranslatedValue(reading) {
+	return getTranslatedRawValue(reading.Value);
 }
 
 export function toggleUnitType() {

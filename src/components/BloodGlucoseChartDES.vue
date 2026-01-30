@@ -3,12 +3,13 @@
 </template>
 
 <script>
-import { IN_RANGE_MIN, IN_RANGE_MAX, CHART_MIN, CHART_MAX } from '../dexcom/valueparser';
+import { IN_RANGE_MIN, IN_RANGE_MAX, CHART_MIN, CHART_MAX, getmgdLValue } from '../dexcom/valueparser';
 
 import { Line } from 'vue-chartjs';
 import 'chartjs-adapter-moment';
 import { Chart as ChartJS, Tooltip, CategoryScale, TimeScale, LineElement, LinearScale, PointElement } from 'chart.js';
 import { smoothData, getColorForReading, getActualReading, horizontalLinePlugin, futureBackgroundPlugin, calculateAverage } from './chartUtils';
+import { forecastAR2, forecastAR2Cone } from '@/plugins/prediction';
 
 const minValue = CHART_MIN;
 const maxValue = CHART_MAX;
@@ -114,18 +115,35 @@ export default {
 			const lastTime = readings[readings.length - 1].time;
 
 			// DES prediction
-			const zodiac = require("zodiac-ts");
-			var alpha = 0;
-			var ses = new zodiac.DoubleExponentialSmoothing(readings.map((reading) => reading.value), alpha);
-			ses.optimizeParameter(20);
-			var forecast = ses.predict(3).slice(-3);
+			// const zodiac = require("zodiac-ts");
+			// var alpha = 0;
+			// var ses = new zodiac.DoubleExponentialSmoothing(readings.map((reading) => reading.value), alpha);
+			// ses.optimizeParameter(20);
+			// var forecast = ses.predict(3).slice(-3);
+
+			// AR2 prediction
+			const series = readings.map(r => getmgdLValue(r.value));
+			const forecast = forecastAR2(series, 4);
+			const forecast_cone = forecastAR2Cone(series, 4, { coneFactor: 2 });
+			
 			const futureDESPoints = forecast.map((value, index) => ({
 				x: new Date(lastTime.getTime() + (index + 1) * 5 * 60 * 1000),
-				y: getActualReading(value, minValue, maxValue).toFixed(2)
+				y: (getActualReading(value, minValue, maxValue)).toFixed(2),
+			}));
+			const futureDESPoints_up = forecast_cone.map((point) => ({
+				x: new Date(lastTime.getTime() + point.k * 5 * 60 * 1000),
+				y: (getActualReading(point.high, minValue, maxValue)).toFixed(2)
+			}));
+			const futureDESPoints_low = forecast_cone.map((point) => ({
+				x: new Date(lastTime.getTime() + point.k * 5 * 60 * 1000),
+				y: (getActualReading(point.low, minValue, maxValue)).toFixed(2)
 			}));
 
 			// definition of labels as all times
-			var times = [...newReadings.map((reading) => reading.time), ...futureDESPoints.map((point) => new Date(point.x))];
+			var times = [
+				...newReadings.map((reading) => reading.time),
+				...futureDESPoints.map((point) => new Date(point.x))
+			];
 
 			// Set chartData with proper structure
 			this.chartData = {
@@ -150,12 +168,23 @@ export default {
 					},
 					{
 						// Prediction points
-						label: 'DES Forecast',
+						label: 'AR2 Forecast cone',
+						data: futureDESPoints_low.concat(futureDESPoints_up),
+						borderColor: 'rgba(49, 151, 190, 1)',
+						borderWidth: 1,
+						pointRadius: 3,
+						pointBackgroundColor: 'transparent',
+						showLine: false
+					},
+					{
+						// Prediction points
+						label: 'AR2 Forecast',
 						data: futureDESPoints,
-						borderColor: 'transparent',
+						borderColor: 'rgba(49, 151, 190, 1)',
 						borderWidth: 0,
 						pointRadius: 3,
 						pointBackgroundColor: 'rgba(49, 151, 190, 1)',
+						showLine: false
 					},
 				]
 			};
