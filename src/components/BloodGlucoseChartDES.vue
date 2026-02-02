@@ -170,10 +170,10 @@ export default {
 						// Prediction points
 						label: 'AR2 Forecast cone',
 						data: futureDESPoints_low.concat(futureDESPoints_up),
-						borderColor: 'rgba(49, 151, 190, 1)',
+						borderColor: 'rgba(49, 151, 190, 0.75)',
 						borderWidth: 1,
-						pointRadius: 3,
-						pointBackgroundColor: 'transparent',
+						pointRadius: 2,
+						pointBackgroundColor: 'rgba(49, 151, 190, 0.25)',
 						showLine: false
 					},
 					{
