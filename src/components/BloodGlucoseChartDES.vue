@@ -122,7 +122,7 @@ export default {
 			// var forecast = ses.predict(3).slice(-3);
 
 			// AR2 prediction
-			const series = readings.map(r => getmgdLValue(r.value));
+			const series = smoothedReadings.map(r => getmgdLValue(r));
 			const forecast = forecastAR2(series, 4);
 			const forecast_cone = forecastAR2Cone(series, 4, { coneFactor: 2 });
 			
